@@ -1,0 +1,9 @@
+#bgs-img
+{
+	background-image:url('//localhost/php_project/Images/home/background.jpg'); 
+	background-repeat:no-repeat;
+	background-size:cover; 
+	height:100%; 
+	
+
+}
