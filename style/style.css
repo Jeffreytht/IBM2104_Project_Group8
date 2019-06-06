@@ -1,11 +1,3 @@
-#bgs-img
-{
-	background-image:url('//localhost/php_project/Images/home/background.jpg'); 
-	background-repeat:no-repeat;
-	background-size:cover; 
-	height:100%; 
-}
-
 .header
 {
 	font-weight:bold; 
@@ -28,6 +20,15 @@
 	font-family: 'cabin';
 }
 
+.signin-jumbotron 
+{
+  background: url("//localhost/php_project/Images/gradient1.jpg") no-repeat center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 
 html,
 body,
@@ -37,7 +38,7 @@ header,
 }
 
 #intro {
-    background: url("//localhost/php_project/Images/home/background1.jpg")no-repeat center center fixed;
+    background: url("//localhost/php_project/Images/home/background1.jpg")no-repeat center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
