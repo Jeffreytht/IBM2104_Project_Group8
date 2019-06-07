@@ -88,12 +88,10 @@
 								echo"<h4 class='my-4 font-weight-bold'>Penang Medical College</h4>";
 							echo"</div>";
 						echo"</div>";						
-						echo "<button type='button' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</button>";						
+						echo "<a href='college.php' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</a>";						
 					echo"</section>";
 				echo"</div>";
 			echo"</main>";
-			echo "<div class='container-fluid'>";	
-			echo "</div>";
 			include("footer.php");
 
 		echo "</body>";
