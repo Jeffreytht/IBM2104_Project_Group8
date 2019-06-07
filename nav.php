@@ -22,8 +22,8 @@
                     echo"<li class='nav-item'>";
                         echo"<a class='nav-link'>";
                             echo"<form class='form-inline' action='/action_page.php'>";
-                                echo"<input class='form-control mr-sm-2' type='text' placeholder='Search'>";
-                                echo"<button class='btn btn-success' type='submit'>Search</button>";
+                                echo"<input class='form-control mr-sm-2' type='text' placeholder='Search College'>";
+                                echo"<button type='submit' id='searchButton' class = 'btn btn-success btn-rounded'>Search<i class='fas fa-search pl-2'></i></button>";
                             echo"</form>";
                         echo"</a>";
                     echo"</li>";

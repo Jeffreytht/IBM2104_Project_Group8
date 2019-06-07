@@ -109,5 +109,8 @@ header,
   box-shadow: 8px 4px 8px 4px rgba(0, 0, 0, 0.2), 20px 6px 20px 6px rgba(0, 0, 0, 0.19);
 }
 
-
+#searchButton
+{
+  border-radius: 40px;
+}
 

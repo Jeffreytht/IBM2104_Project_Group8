@@ -177,125 +177,118 @@
 	
 							echo"</div>";
 							echo"<div class='col-md-8 mx-3'>";
-								?>
-								<div class="py-2 px-3 bg-white">
-									<h3 class="font-weight-bold">Colleges In Malaysia</h3>
-								</div>
+								echo"<div class='py-2 px-3 bg-white'>";
+									echo"<h3 class='font-weight-bold'>Colleges In Malaysia</h3>";
+								echo"</div>";
+								echo"<div class='scrollbar mt-3' id='style-3' style='height:50vh;'>";
+									echo"<div class='bg-white py-3 px-2 college-list'>";
+										echo"<div class='row'>";
+											echo"<div class='col-md-4 d-flex align-items-center justify-content-center'>";
+												echo"<img src='images/logo/inti.png' class='img-fluid college-logo'>";
+											echo"</div>";
+											echo"<div class='col-md-8'>";
+												echo"<h5 class='font-weight-bold'>INTI College Penang</h5>";
+												echo"<div class='mb-2'>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+												echo"</div>";
+												echo"<div class='row'>";
+													echo"<div class='col-md-6'>";
+														echo"<h6>Location: Penang</h6>";
+														echo"<h6>Course Offer: 100</h6>";
+													echo"</div>";
+													echo"<div class='col-md-6'>";
+														echo"<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>";
+													echo"</div>";
+												echo"</div>";
+											echo"</div>";
+										echo"</div>";
+									echo"</div>";
 
-								<div class='scrollbar mt-3' id='style-3' style='height:50vh;'>
-									<div class="bg-white py-3 px-2 college-list">
-										<div class="row">
-											<div class="col-md-4 d-flex align-items-center justify-content-center">
-												<img src="images/logo/inti.png" class="img-fluid college-logo">
-											</div>
-											
-											<div class="col-md-8">
-												<h5 class="font-weight-bold">INTI College Penang</h5>
-												<div class="mb-2">
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-												</div>
-												<div class="row">
-													<div class="col-md-6">
-														<h6>Location: Penang</h6>
-														<h6>Course Offer: 100</h6>
-													</div>
-													<div class="col-md-6">
-														<a href="" class="btn btn-outline-secondary btn-rounded waves-effect">View Detail<i class="fas fa-list pl-2"></i></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
+									echo"<div class='bg-white mt-3 py-3 px-2 college-list'>";
+										echo"<div class='row'>";
+											echo"<div class='col-md-4 d-flex align-items-center justify-content-center'>";
+												echo"<img src='images/logo/segi.png' class='img-fluid  college-logo'>";
+											echo"</div>";
+											echo"<div class='col-md-8'>";
+												echo"<h5 class='font-weight-bold'>SEGI College Penang</h5>";
+												echo"<div class='mb-2'>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star'></span>";
+													echo"<span class='fa fa-star'></span>";
+												echo"</div>";
+												echo"<div class='row'>";
+													echo"<div class='col-md-6'>";
+														echo"<h6>Location: Penang</h6>";
+														echo"<h6>Course Offer: 100</h6>";
+													echo"</div>";
+													echo"<div class='col-md-6'>";
+														echo"<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>";
+													echo"</div>";
+												echo"</div>";
+											echo"</div>";
+										echo"</div>";
+									echo"</div>";
 
-									<div class="bg-white mt-3 py-3 px-2 college-list">
-										<div class="row">
-											<div class="col-md-4 d-flex align-items-center justify-content-center">
-												<img src="images/logo/segi.png" class="img-fluid  college-logo">
-											</div>
-										
-											<div class="col-md-8">
-												<h5 class="font-weight-bold">SEGI College Penang</h5>
-												<div class="mb-2">
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star"></span>
-													<span class="fa fa-star"></span>
-												</div>
-												<div class="row">
-													<div class="col-md-6">
-														<h6>Location: Penang</h6>
-														<h6>Course Offer: 100</h6>
-													</div>
-													<div class="col-md-6">
-														<a href="" class="btn btn-outline-secondary btn-rounded waves-effect">View Detail<i class="fas fa-list pl-2"></i></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
+									echo"<div class='bg-white mt-3 py-3 px-2 college-list'>";
+										echo"<div class='row'>";
+											echo"<div class='col-md-4 d-flex align-items-center justify-content-center'>";
+												echo"<img src='images/logo/tarc.jpg' class='img-fluid college-logo'>";
+											echo"</div>";
+											echo"<div class='col-md-8'>";
+												echo"<h5 class='font-weight-bold'>TARC College Penang</h5>";
+												echo"<div class='mb-2'>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star'></span>";
+													echo"<span class='fa fa-star'></span>";
+												echo"</div>";
+												echo"<div class='row'>";
+													echo"<div class='col-md-6'>";
+														echo"<h6>Location: Penang</h6>";
+														echo"<h6>Course Offer: 100</h6>";
+													echo"</div>";
+													echo"<div class='col-md-6'>";
+														echo"<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>";
+													echo"</div>";
+												echo"</div>";
+											echo"</div>";
+										echo"</div>";
+									echo"</div>";
 
-									<div class="bg-white mt-3 py-3 px-2 college-list">
-										<div class="row">
-											<div class="col-md-4 d-flex align-items-center justify-content-center">
-												<img src="images/logo/tarc.jpg" class="img-fluid college-logo">
-											</div>
-								
-											<div class="col-md-8">
-												<h5 class="font-weight-bold">TARC College Penang</h5>
-												<div class="mb-2">
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star"></span>
-													<span class="fa fa-star"></span>
-												</div>
-												<div class="row">
-													<div class="col-md-6">
-														<h6>Location: Penang</h6>
-														<h6>Course Offer: 100</h6>
-													</div>
-													<div class="col-md-6">
-														<a href="" class="btn btn-outline-secondary btn-rounded waves-effect">View Detail<i class="fas fa-list pl-2"></i></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div class="bg-white mt-3 py-3 px-2 college-list">
-										<div class="row">
-											<div class="col-md-4 d-flex align-items-center justify-content-center">
-												<img src="images/logo/kdu.png" class="img-fluid college-logo" >
-											</div>
-										
-											<div class="col-md-8">
-												<h5 class="font-weight-bold">KDU College Penang</h5>
-												<div class="mb-2">
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star checked"></span>
-													<span class="fa fa-star"></span>
-												</div>
-												<div class="row">
-													<div class="col-md-6">
-														<h6>Location: Penang</h6>
-														<h6>Course Offer: 100</h6>
-													</div>
-													<div class="col-md-6">
-														<a href="" class="btn btn-outline-secondary btn-rounded waves-effect">View Detail<i class="fas fa-list pl-2"></i></a>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<?php
+									echo"<div class='bg-white mt-3 py-3 px-2 college-list'>";
+										echo"<div class='row'>";
+											echo"<div class='col-md-4 d-flex align-items-center justify-content-center'>";
+												echo"<img src='images/logo/kdu.png' class='img-fluid college-logo' >";
+											echo"</div>";
+											echo"<div class='col-md-8'>";
+												echo"<h5 class='font-weight-bold'>KDU College Penang</h5>";
+												echo"<div class='mb-2'>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star checked'></span>";
+													echo"<span class='fa fa-star'></span>";
+												echo"</div>";
+												echo"<div class='row'>";
+													echo"<div class='col-md-6'>";
+														echo"<h6>Location: Penang</h6>";
+														echo"<h6>Course Offer: 100</h6>";
+													echo"</div>";
+													echo"<div class='col-md-6'>";
+														echo"<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>";
+													echo"</div>";
+												echo"</div>";
+											echo"</div>";
+										echo"</div>";
+									echo"</div>";
+								echo"</div>";
 							echo"</div>";
 						echo"</div>";
 					echo"</div>";
