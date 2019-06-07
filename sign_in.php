@@ -37,7 +37,7 @@
 								echo"<div class='text-center'>";
 									echo"<button type='submit' class='text-white btn blue-gradient col-md-6 my-4'>Sign In</button>";
 									echo"<p>";
-										echo"Not a member?";
+										echo"Not a member? ";
 										echo"<a href='register.php'>Register</a>";
 									echo"</p>";
 								echo"</div>";
