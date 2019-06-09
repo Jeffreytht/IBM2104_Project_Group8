@@ -114,3 +114,23 @@ header,
   border-radius: 40px;
 }
 
+.collegeDetail
+{
+  width :800px;
+  margin-top:98px;
+}
+
+.circle-image
+{
+  border-radius:50%;
+  border:2px solid #fff;
+  height:150px;
+  width:150px;
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+}
+
+footer
+{
+
+
+}

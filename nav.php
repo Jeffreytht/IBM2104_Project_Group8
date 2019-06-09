@@ -15,6 +15,9 @@
                         echo"<a class='nav-link' href='index.php'>Home</a>";
                     echo"</li>";
                     echo"<li class='nav-item'>";
+                        echo"<a class='nav-link' href='news.php'>News</a>";
+                    echo"</li>";
+                    echo"<li class='nav-item'>";
                         echo"<a class='nav-link' href='college.php'>Colleges</a>";
                     echo"</li>";
                 echo"</ul>";
