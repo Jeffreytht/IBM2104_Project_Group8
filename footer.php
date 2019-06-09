@@ -1,6 +1,6 @@
 <?php
-    echo"<footer class='page-footer font-small unique-color-dark'>";
-        echo"<div class='container mt-5 pt-3 mb-0 text-center text-md-left'>";
+    echo"<footer class='mt-5 page-footer font-small unique-color-dark'>";
+        echo"<div class='container pt-2 mb-0 text-center text-md-left'>";
             echo"<div class='row'>";
                 echo"<div class='col-md-3 col-lg-4 col-xl-3 mb-4 mt-3'>";
                     echo"<h6 class='text-uppercase font-weight-bold'>";
@@ -44,7 +44,7 @@
                 echo"</div>";
             echo"</div>";
         echo"</div>";
-        echo"<div class='footer-copyright text-center py-3'>© <?php echo date('Y');?> Copyright:";
+        echo"<div class='footer-copyright text-center py-2'>© <?php echo date('Y');?> Copyright:";
             echo"<a href='index.php'> GODs</a>";
         echo"</div>";
     echo"</footer>";

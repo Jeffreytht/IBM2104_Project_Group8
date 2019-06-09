@@ -5,10 +5,10 @@
 		include("header.html");
 		echo "</head>";
 		echo "<body>";
-		echo "<div id='intro' class='view' width='100%'>";
+		echo "<div id='intro' class='view' height=100% width='100%'>";
 			echo"<div class='mask rgba-black-strong'>";
-				echo"<div class='container d-flex align-items-center justify-content-center'>";
-					echo"<div class='mt-3 pt-5 col-md-5'>";
+				echo"<div class='container d-flex align-items-center justify-content-center h-100'>";
+					echo"<div class='col-md-5'>";
 						echo"<div class ='jumbotron card card-image signin-jumbotron my-0'>";
 							echo"<h2 class='display-4 text-white text-center'><strong>GODs</strong></h2>";
 						echo"</div>";

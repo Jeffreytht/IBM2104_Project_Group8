@@ -7,7 +7,7 @@
 		echo "<body>";
 		echo "<div id='intro' class='view''>";
 			echo"<div class='mask rgba-black-strong'>";
-				echo"<div class='container d-flex align-items-center justify-content-center'>";
+				echo"<div class='container d-flex align-items-center justify-content-center h-100'>";
 					echo"<div class='mt-3 pt-5 pb-5 col-md-5'>";
 						echo"<div class ='jumbotron card card-image signin-jumbotron my-0'>";
 							echo"<h2 class='display-4 text-white text-center'><strong>GODs</strong></h2>";

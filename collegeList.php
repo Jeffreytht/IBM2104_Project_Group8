@@ -6,9 +6,8 @@
 		echo "</head>";
 
 		echo "<body class='bg-light'>";
-
 			include("nav.php");
-			echo"<main class='mt-5 pt-5' id='wrap'>";
+			echo"<main class='mt-5 pt-5 main' id='wrap'>";
 				echo"<div class='container'>";	
 					echo"<div class='row mt-5'>";
 						echo"<div class='col-md-3 mx-3 px-4 py-4 bg-white' style='max-height:470px'>";
@@ -50,7 +49,7 @@
 							echo"<div class='py-2 px-3 bg-white'>";
 								echo"<h3 class='font-weight-bold'>Colleges In Malaysia</h3>";
 							echo"</div>";
-							echo"<div class='scrollbar mt-3' id='style-3' style='height:60vh;'>";
+							echo"<div class='scrollbar mt-3' id='style-3' style='height:65vh;'>";
 								echo"<div class='bg-white py-3 px-2 college-list'>";
 									echo"<div class='row'>";
 										echo"<div class='col-md-4 d-flex align-items-center justify-content-center'>";

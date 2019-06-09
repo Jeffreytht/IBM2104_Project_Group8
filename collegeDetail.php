@@ -1,13 +1,14 @@
 <?php
 	echo "<!DOCTYPE html>";
-		echo "<html lang='en'>";
+		echo "<html lang='en' class='h-100'>";
 			echo "<head>";
 				include("header.html");						
 			echo "</head>";
-			echo "<body class='bg-light'>";
+			echo "<body class='bg-light h-100'>";
 			include("nav.php");
 ?>
 
+<main class='main'>
 <div class='container d-flex justify-content-center'>
 	<div class='collegeDetail'>	
 		<div class="view border rounded" height=100%>
@@ -39,9 +40,9 @@
 		</div>		
 	</div>
 </div>
-
+</main>
 <?php
-	include("footer.php");
+		include("footer.php");
 	echo "</body>";
 	echo "</html>";
 ?>

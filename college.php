@@ -130,12 +130,8 @@
 			echo "</br>";
 	}
 
-
-	
 	if($_GET)
 		require('collegeDetail.php');
 	else								
 		require('collegeList.php');
-
-	
 ?>
