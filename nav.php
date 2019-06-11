@@ -33,9 +33,9 @@
                     echo"<li class='nav-item'>";
                         echo"<a class='nav-link' href='sign_in.php'><i class='fas fa-sign-in-alt fa-2x mt-3'></i></a>";
                     echo"</li>";
-                    echo"<li class='nav-item'>";
-                        echo"<a class='nav-link'><i class='fas fa-sign-out-alt fa-2x mt-3'></i></a>";
-                    echo"</li>";
+                    // echo"<li class='nav-item'>";
+                    //     echo"<a class='nav-link'><i class='fas fa-sign-out-alt fa-2x mt-3'></i></a>";
+                    // echo"</li>";
                 echo"</ul>";
             echo"</div>";
         echo"</div>";
