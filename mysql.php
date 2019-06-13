@@ -16,11 +16,11 @@
 
 	
 
-	$sql = "CREATE TABLE User(
+	$sql = "CREATE TABLE Users(
 			user_id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 			user_name VARCHAR(30) NOT NULL,
 			email VARCHAR(50) NOT NULL,
-			password VARCHAR(20) NOT NULL,
+			pwd VARCHAR(20) NOT NULL,
 			dob DATE NOT NULL,
 			reg_date TIMESTAMP
 		)";
@@ -45,7 +45,7 @@
 	$sql = "CREATE TABLE User_Role(
 			user_id INT(6) UNSIGNED NOT NULL,
 			role_id INT(6) UNSIGNED NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES User(user_id),
+			FOREIGN KEY (user_id) REFERENCES Users(user_id),
 			FOREIGN KEY (role_id) REFERENCES Role(role_id)
 			)";
 
