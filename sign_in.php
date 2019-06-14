@@ -1,4 +1,11 @@
 <?php
+	session_start();
+	if(isset($_SESSION['user']))
+	{
+		unset($_SESSION['user']);
+		header("Location:index.php");
+	}
+
 	$errorMessage;
 	$errorMessage = array_fill(0,2,"");
 	class User
@@ -43,15 +50,15 @@
 
 				if($selectedUser['user_name'] == $this->username && $selectedUser['pwd'] == $this->password)
 				{
+					$_SESSION['user'] = $this->username;
 					echo "<script>";
-				echo "alert('Login Successfully');";
-				echo "window.location.replace(\"index.php\");";
-				echo "</script>";
+						echo "alert('Login Successfully');";
+						echo "window.location.replace(\"index.php\");";
+					echo "</script>";
 				}
 				else
 					$errorMessage[1] = "Invalid password";
 			}
-
 		}
 	}
 

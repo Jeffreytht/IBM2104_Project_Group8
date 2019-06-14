@@ -1,6 +1,6 @@
 <?php
 	$errorMessage;
-	$errorMessage = array_fill(0,2,"");
+	$errorMessage = array_fill(0,5,"");
 	class User
 	{
 		private $username;
