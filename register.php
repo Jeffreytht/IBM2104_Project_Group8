@@ -62,7 +62,7 @@
 				$errorMessage[0] = "Username cannot exceed 20 characters";
 				$is_valid = FALSE;
 			}
-			else if(!preg_match("[/ /]",$this->username))
+			else if(preg_match("[/ /]",$this->username))
 			{
 				global $errorMessage;
 				$errorMessage[0] = "Username cannot contain whitespace";
