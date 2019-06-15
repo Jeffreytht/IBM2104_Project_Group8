@@ -84,7 +84,7 @@
 							<div class='bg-light scrollbar' id='style-1' style='height:50vh; max-height:350px'>
 								<form class='px-5 pb-3' action='$self' method='post'>
 									<div class='md-form'>
-										<i class='fa fa-envelope prefix purple-text'></i>
+										<i class='fas fa-user prefix purple-text'></i>
 										<input mdbActive class='form-control pl-2' type='text' name='username' value='{$user->getUsername()}' required autocomplete='off' placeholder='Username'/>
 										<div class="text-danger ml-5">$errorMessage[0]</div>
 									</div>
