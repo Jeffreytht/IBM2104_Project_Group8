@@ -1,4 +1,6 @@
 <?php
+	require("models/users.php");
+	session_start();
 
 	class Wrapper
 	{
@@ -23,8 +25,6 @@
 		echo "<head>";
 			include("header.html");
 		echo "</head>";
-
-
 		echo "<body>";
 		include("nav.php");
 

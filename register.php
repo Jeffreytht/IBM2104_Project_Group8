@@ -1,38 +1,10 @@
 <?php
 	$errorMessage;
 	$errorMessage = array_fill(0,5,"");
-	class User
+
+	require("models/users.php");
+	class Users extends User
 	{
-		private $username;
-		private $email;
-		private $pwd;
-		private $retypePwd;
-		private $dob;	
-		const server = "localhost";
-		const user = "root";
-		const password="";
-		const db = "college_portal";
-		
-		public function setUsername($username){$this->username = $username;}
-		public function setEmail($email){$this->email = $email;}
-		public function setPwd($pwd){$this->pwd = $pwd;}
-		public function setRetypePwd($retypePwd){$this->retypePwd = $retypePwd;}
-		public function setDob($dob){$this->dob = $dob;}
-		public function getUsername(){return $this->username;}
-		public function getEmail(){return $this->email;}
-		public function getPwd(){return $this->pwd;}
-		public function getRetypePwd(){return $this->retypePwd;}
-		public function getdob(){return $this->dob;}
-
-		public function __construct()
-		{			
-			$this->username = "";
-			$this->email = "";
-			$this->pwd = "";
-			$this->retypePwd = "";
-			$this->dob = "";		
-		}
-
 		public function validateData()
 		{
 			$is_valid = TRUE;
@@ -46,143 +18,6 @@
 
 			if($is_valid)
 				$this->saveResult();
-		}
-
-		private function validateName(&$is_valid)
-		{
-			if(empty($this->username))
-			{
-				global $errorMessage;
-				$errorMessage[0] = "Username cannot be empty";
-				$is_valid = FALSE;
-			}
-			else if(strlen($this->username) > 20)
-			{
-				global $errorMessage;
-				$errorMessage[0] = "Username cannot exceed 20 characters";
-				$is_valid = FALSE;
-			}
-			else if(preg_match("[/ /]",$this->username))
-			{
-				global $errorMessage;
-				$errorMessage[0] = "Username cannot contain whitespace";
-				$is_valid = FALSE;
-			}
-
-			else
-			{
-				$conn = new mysqli(self::server, self::user, self::password, self::db);
-				$name = $conn->real_escape_string($this->username);
-				$sql = "CALL SelectUser(\"user_name\",\"$name\")";
-				$result = $conn->query($sql);
-
-				if($result->num_rows > 0 )
-				{		
-					global $errorMessage;
-					$errorMessage[0] = "Username had been taken";
-					$is_valid = FALSE;
-				}
-
-				$result->close();
-				$conn->close();
-			}
-		}
-
-		private function validateEmail(&$is_valid)
-		{
-			if(empty($this->email))
-			{
-				global $errorMessage;
-				$errorMessage[1] = "Email cannot be empty";
-				$is_valid = FALSE;
-			}
-			else if(!filter_var($this->email, FILTER_VALIDATE_EMAIL))
-			{
-				global $errorMessage;
-				$errorMessage[1] = "Email must be in this format E.g. abcdefgh@xxx.com";
-				$is_valid = FALSE;
-			}
-			else
-			{
-				$conn = new mysqli(self::server, self::user, self::password, self::db);
-				$email = $conn->real_escape_string($this->email);
-				$sql = "CALL SelectUser(\"email\",\"$email\")";
-				$result = $conn->query($sql);
-
-				if($result->num_rows > 0)
-				{
-					global $errorMessage;
-					$errorMessage[1] = "Email Address already exists <br/><a href='sign_in.php' class='text-primary'>Sign in now ?</a>";
-					$is_valid = FALSE;
-				}
-				
-				$conn->close();
-			}
-		}
-
-		private function validatePwd(&$is_valid)
-		{
-			if(empty($this->pwd))
-			{
-				global $errorMessage;
-				$errorMessage[2] = "Password cannot be empty";
-				$is_valid = FALSE;
-			}
-
-			else if(strlen($this->pwd) < 8)
-			{
-				global $errorMessage;
-				$errorMessage[2] = "Password must contain at least 8 characters";
-				$this->pwd ="";
-				$this->retypePwd = "";
-				$is_valid = FALSE;
-			}
-
-			else
-			{
-				$alphabetic = preg_match('@[A-Za-z]@',$this->pwd);
-				$numeric = preg_match('@[0-9]@',$this->pwd);
-
-				if(!$alphabetic || !$numeric) 
-				{
-					global $errorMessage;
-					$errorMessage[2] = "Password must contain alphabet and number";
-					$this->pwd ="";
-					$this->retypePwd = "";
-					$is_valid = FALSE;
-				}
-
-				else if($this->pwd != $this->retypePwd)
-				{
-					$this->retypePwd = "";
-					global $errorMessage;
-					$errorMessage[3] = "Password and Retype password cannot be different";
-					$is_valid = FALSE;
-				}
-			}
-		}
-
-		private function validateDob(&$is_valid)
-		{
-			if(empty($this->dob))
-			{
-				global $errorMessage;
-				$errorMessage[4] = "Date of birth cannot be empty";
-				$is_valid = FALSE;
-			}
-
-			else
-			{
-				$dob = date_create($this->dob);
-				$today = date_create(date("y-m-d"));
-				if($dob > $today)
-				{
-					$this->dob = "";
-					global $errorMessage;
-					$errorMessage[4] = "Date of birth cannot be in future";
-					$is_valid = FALSE;
-				}
-			}
 		}
 
 		private function saveResult()
@@ -213,7 +48,7 @@
 		}
 	}
 
-	$user = new User();
+	$user = new Users();
 	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
 
 	if($_POST)

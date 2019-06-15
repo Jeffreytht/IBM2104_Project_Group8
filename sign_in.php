@@ -1,35 +1,21 @@
 <?php
+
+	require("models/users.php");
 	session_start();
+
 	if(isset($_SESSION['user']))
 	{
-		unset($_SESSION['user']);
 		header("Location:index.php");
 	}
 
 	$errorMessage;
 	$errorMessage = array_fill(0,2,"");
-	class User
+
+	class Users extends User
 	{
-		private $username;
-		private $password;
-		const server = "localhost";
-		const user = "root";
-		const pwd = "";
-		const db = "college_portal";
-
-		public function getUsername(){return $this->username;}
-		public function getPassword(){return $this->password;}
-		public function setUsername($username){$this->username = $username;}
-		public function setPassword($password){$this->password = $password;} 	
-		public function __constructor()
-		{
-			$this->$username = "";
-			$this->$password = "";
-		}
-
 		public function validateData()	
 		{
-			$conn = new mysqli(self::server, self::user, self::pwd, self::db);
+			$conn = new mysqli(self::server, self::user, self::password, self::db);
 			if($conn->connect_error)
 			{
 				die("Connection fail". $conn->connect_error);
@@ -46,14 +32,22 @@
 			else 
 			{
 				$selectedUser = $result->fetch_assoc();
+				$conn->close();
 				global $errorMessage;
 
-				if($selectedUser['user_name'] == $this->username && $selectedUser['pwd'] == $this->password)
+				if($selectedUser['user_name'] == $this->username && $selectedUser['pwd'] == $this->pwd)
 				{
-					$_SESSION['user'] = $this->username;
+					$conn = new mysqli(self::server, self::user, self::password, self::db);
+				    $sql = "CALL SelectAllUserDetails(\"$this->username\")";
+				    $result = $conn->query($sql);
+				    $userDetail = $result->fetch_assoc();
+				    $user = new User();
+				    $user->assignUser($userDetail);
+				    $_SESSION['user'] = $user;
+	
 					echo "<script>";
-						echo "alert('Login Successfully');";
-						echo "window.location.replace(\"index.php\");";
+					echo "alert('Login Successfully');";
+					echo "window.location.replace(\"index.php\");";
 					echo "</script>";
 				}
 				else
@@ -62,13 +56,13 @@
 		}
 	}
 
-	$user = new User();
+	$user = new Users();
 	$self = htmlspecialchars("$_SERVER[PHP_SELF]");
 	
 	if($_POST)
 	{
 		$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
-		$user->setPassword(htmlspecialchars($_POST["pwd"]));
+		$user->setPwd(htmlspecialchars($_POST["pwd"]));
 		$user->validateData();
 	}
 
@@ -96,7 +90,7 @@
 									</div>
 									<div class='md-form'>
 										<i class='fas fa-key prefix purple-text'></i>
-										<input mdbActive class='form-control pl-2' type='password' name='pwd' value='{$user->getPassword()}' required autocomplete='off' placeholder='Password'/>
+										<input mdbActive class='form-control pl-2' type='password' name='pwd' value='{$user->getPwd()}' required autocomplete='off' placeholder='Password'/>
 										<div class="text-danger ml-5">$errorMessage[1]</div>
 									</div>
 									<div class='d-flex justify-content-around'>

@@ -14,8 +14,6 @@
 	echo "Connect Successfully!";
 	echo "<br/>";
 
-	
-
 	$sql = "CREATE TABLE Users(
 			user_id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 			user_name VARCHAR(30) NOT NULL,

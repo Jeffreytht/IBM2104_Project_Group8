@@ -132,6 +132,6 @@
 
 	if($_GET)
 		require('collegeDetail.php');
-	else								
+	else							
 		require('collegeList.php');
 ?>

@@ -137,3 +137,21 @@ header,
   box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
 }
 
+.circle-icon
+{
+  border-radius:50%;
+  border:2px solid #fff;
+  height:200px;
+  width:200px;
+  box-shadow: 0 0 2px 1px rgba(0, 51, 102, 0.5);
+}
+
+.userDetail
+{
+  margin-top:98px;
+}
+
+.text-indigo
+{
+  color:#24355C;
+}

@@ -1,5 +1,5 @@
 <?php
-    echo"<footer class='mt-5 page-footer font-small unique-color-dark'>";
+    echo"<footer class='page-footer font-small unique-color-dark'>";
         echo"<div class='container pt-2 mb-0 text-center text-md-left'>";
             echo"<div class='row'>";
                 echo"<div class='col-md-3 col-lg-4 col-xl-3 mb-4 mt-3'>";

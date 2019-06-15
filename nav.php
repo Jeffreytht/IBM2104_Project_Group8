@@ -1,10 +1,10 @@
 <?php
-
-session_start();
 $style = ($_SERVER['SCRIPT_NAME'] !== "/php_project/index.php")?"<nav class='navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar' style='background-color:#24355C;'>":"<nav class='navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar'>";
 
 if(isset($_SESSION['user']))
-$user =
+{
+    $user = $_SESSION['user'];
+$userPage =
 <<< USER
     <ul class='navbar-nav nav-flex-icons'>
         <li class='nav-item'>
@@ -18,17 +18,18 @@ $user =
     </ul>
     <ul class='navbar-nav smooth-scroll ml-3'>
         <li class='nav-item dropdown'>
-            <a class='nav-link dropdown-toggle' data-toggle="dropdown" href='#'><i class="fas fa-user pr-2"></i>$_SESSION[user]</a>
+            <a class='nav-link dropdown-toggle' data-toggle="dropdown" href='#'><i class="fas fa-user pr-2"></i>{$user->getUsername()}</a>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">My account</a>
-                <a class="dropdown-item" href="sign_in.php">Log out</a>
+                <a class="dropdown-item" href="my_account.php">My account</a>
+                <a class="dropdown-item" href="sign_out.php">Log out</a>
             </div>
         </li>
     </ul>
 USER;
+}
 
 else
-$user = 
+$userPage = 
 <<< VISITOR
     <ul class='navbar-nav nav-flex-icons'>
         <li class='nav-item'>
@@ -46,6 +47,7 @@ $user =
         </li>
     </ul>
 VISITOR;
+
 
 $nav = 
 <<< NAV
@@ -67,7 +69,7 @@ $nav =
                         <a class='nav-link' href='college.php'>Colleges</a>
                     </li>
                 </ul>
-                $user
+                $userPage
             </div>
         </div>
     </nav>
