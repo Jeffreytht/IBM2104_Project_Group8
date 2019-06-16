@@ -1,6 +1,6 @@
 var dob;
 
-function validateDOB()
+function validateDob()
  {
  	if($("#dob").val() !== dob)
  		$("#scBtn").prop("disabled",false);
@@ -20,9 +20,10 @@ function validateDOB()
  		$("#scBtn").prop("disabled",true);
  }
 
+
 $(document).ready(function(){
 
 	 dob = $("#dob").val();
-	 $("#dob").blur(validateDOB);
+	 $("#dob").blur(validateDob);
 	 $(".pwd").blur(validatePwd);
 });

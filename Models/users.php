@@ -1,4 +1,13 @@
 <?php
+	$errorMessage;
+	
+
+	function startUser($num)
+	{
+		global $errorMessage;
+		$errorMessage = array_fill(0,$num,"");
+	}
+
 	class User
 	{
 		protected $userID;
@@ -66,24 +75,24 @@
 			$this->roleID = $user['role_id'];		
 		}
 
-		public function validateName(&$is_valid)
+		public function validateName(&$is_valid, $index)
 		{
 			if(empty($this->username))
 			{
 				global $errorMessage;
-				$errorMessage[0] = "Username cannot be empty";
+				$errorMessage[$index] = "Username cannot be empty";
 				$is_valid = FALSE;
 			}
 			else if(strlen($this->username) > 20)
 			{
 				global $errorMessage;
-				$errorMessage[0] = "Username cannot exceed 20 characters";
+				$errorMessage[$index] = "Username cannot exceed 20 characters";
 				$is_valid = FALSE;
 			}
 			else if(preg_match("[/ /]",$this->username))
 			{
 				global $errorMessage;
-				$errorMessage[0] = "Username cannot contain whitespace";
+				$errorMessage[$index] = "Username cannot contain whitespace";
 				$is_valid = FALSE;
 			}
 
@@ -106,20 +115,22 @@
 			}
 		}
 
-		public function validateEmail(&$is_valid)
+		public function validateEmail(&$is_valid, $index)
 		{
 			if(empty($this->email))
 			{
 				global $errorMessage;
-				$errorMessage[1] = "Email cannot be empty";
+				$errorMessage[$index] = "Email cannot be empty";
 				$is_valid = FALSE;
 			}
+			
 			else if(!filter_var($this->email, FILTER_VALIDATE_EMAIL))
 			{
 				global $errorMessage;
-				$errorMessage[1] = "Email must be in this format E.g. abcdefgh@xxx.com";
+				$errorMessage[$index] = "Email must be in this format E.g. abcdefgh@xxx.com";
 				$is_valid = FALSE;
 			}
+
 			else
 			{
 				$conn = new mysqli(self::server, self::user, self::password, self::db);
@@ -130,7 +141,7 @@
 				if($result->num_rows > 0)
 				{
 					global $errorMessage;
-					$errorMessage[1] = "Email Address already exists <br/><a href='sign_in.php' class='text-primary'>Sign in now ?</a>";
+					$errorMessage[$index] = "Email Address already exists <br/><a href='sign_in.php' class='text-primary'>Sign in now ?</a>";
 					$is_valid = FALSE;
 				}
 				
@@ -138,19 +149,19 @@
 			}
 		}
 
-		public function validatePwd(&$is_valid, $check_retype = TRUE)
+		public function validatePwd(&$is_valid, $index)
 		{
 			if(empty($this->pwd))
 			{
 				global $errorMessage;
-				$errorMessage[2] = "Password cannot be empty";
+				$errorMessage[$index] = "Password cannot be empty";
 				$is_valid = FALSE;
 			}
 
 			else if(strlen($this->pwd) < 8)
 			{
 				global $errorMessage;
-				$errorMessage[2] = "Password must contain at least 8 characters";
+				$errorMessage[$index] = "Password must contain at least 8 characters";
 				$this->pwd ="";
 				$this->retypePwd = "";
 				$is_valid = FALSE;
@@ -164,28 +175,31 @@
 				if(!$alphabetic || !$numeric) 
 				{
 					global $errorMessage;
-					$errorMessage[2] = "Password must contain alphabet and number";
+					$errorMessage[$index] = "Password must contain alphabet and number";
 					$this->pwd ="";
 					$this->retypePwd = "";
-					$is_valid = FALSE;
-				}
-
-				else if($check_retype && $this->pwd != $this->retypePwd)
-				{
-					$this->retypePwd = "";
-					global $errorMessage;
-					$errorMessage[3] = "Password and Retype password must not be different";
 					$is_valid = FALSE;
 				}
 			}
 		}
 
-		public function validateDob(&$is_valid)
+		public function validateRetypePwd(&$is_valid, $index)
+		{
+			if($this->pwd != $this->retypePwd)
+			{
+				$this->retypePwd = "";
+				global $errorMessage;
+				$errorMessage[$index] = "Password and Retype password must not be different";
+				$is_valid = FALSE;
+			}
+		}
+
+		public function validateDob(&$is_valid, $index)
 		{
 			if(empty($this->dob))
 			{
 				global $errorMessage;
-				$errorMessage[4] = "Date of birth cannot be empty";
+				$errorMessage[$index] = "Date of birth cannot be empty";
 				$is_valid = FALSE;
 			}
 
@@ -197,7 +211,7 @@
 				{
 					$this->dob = "";
 					global $errorMessage;
-					$errorMessage[4] = "Date of birth cannot be in future";
+					$errorMessage[$index] = "Date of birth cannot be in future";
 					$is_valid = FALSE;
 				}
 			}

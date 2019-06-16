@@ -56,7 +56,7 @@ echo <<<BODY
 						</div>
 						<div class='col-md-8 mx-3'>
 							<div class='py-2 px-3 bg-white'>
-								<h3 class='font-weight-bold'>Colleges In Malaysia</h3>
+								<h3 class='font-weight-bold'>Institute In Malaysia</h3>
 							</div>
 							<div class='scrollbar mt-3' id='style-3' style='height:65vh;'>
 								<div class='bg-white py-3 px-2 college-list'>
@@ -79,7 +79,7 @@ echo <<<BODY
 													<h6>Course Offer: 100</h6>
 												</div>
 												<div class='col-md-6'>
-													<a href='college.php?college=inti' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
+													<a href='institute.php?college=inti' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
 												</div>
 											</div>
 										</div>

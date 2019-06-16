@@ -2,33 +2,35 @@
 
 require("models/users.php");
 session_start();
-$errorMessage;
-$errorMessage = array_fill(0,5,"");
-$wtf = "";
+startUser(4);
+
+$pwd1 = "";
+$pwd2 = "";
+$pwd3 = "";
 
 if($_POST)
 {
+	$pwd1 = $_POST['pwd1'];
+	$pwd2 = $_POST['pwd2'];
+	$pwd3 = $_POST['pwd3'];
+
 	$conn = mysqli_connect("localhost","root","","college_portal");
-	$user = new User();
 	
+	$user = new User();
 	$userID = $_SESSION['user']->getUserID();
 	$is_valid = TRUE;
 
 	$user->setDob($_POST['dob']);
-	$user->validateDob($is_Valid);
+	$user->validateDob($is_Valid, 0);
 
 	if(empty($_POST['pwd1']) && empty(($_POST['pwd2'])) && empty($_POST['pwd3']))
-	{
-		$wtf .= "1" .$_POST['pwd1'];
 		$user->setPwd($_SESSION['user']->getPwd());
-	}
+	
 	else
 	{
-		$wtf .= "2";
-
 		if($_POST['pwd1'] != $_SESSION['user']->getPwd())
 		{
-			$errorMessage[3] = "Invalid password";
+			$errorMessage[1] = "Invalid password";
 			$is_valid = FALSE;
 		}
 
@@ -40,20 +42,21 @@ if($_POST)
 
 		else if($_POST['pwd2'] != $_POST['pwd3'])
 		{
-			$errorMessage[2] = "New password and retype new password must not be different";
+			$errorMessage[3] = "New password and retype new password must not be different";
 			$is_valid = FALSE;
 		}
 
 		else
 		{
 			$user->setPwd($_POST['pwd2']);
-			$user->validatePwd($is_valid,FALSE);
+			$user->setRetypePwd($_POST['pwd3']);
+			$user->validatePwd($is_valid,2);
+			$user->validateRetypePwd($is_valid,3);
 		}
 	}
 
 	if($is_valid)
 	{
-		$wtf .= "3";
 		$sql = "CALL UpdateUser(\"$userID\", \"{$user->getDob()}\",\"{$user->getPwd()}\")";
 		if($conn->query($sql)=== TRUE)
 		{
@@ -84,7 +87,7 @@ echo "<!DOCTYPE html>";
 echo <<< BODY
 	<main class="main bg-light">
 		<div class='container d-flex justify-content-center'>
-			<div class='userDetail col-md-6 bg-white pt-5'>
+			<div class='userDetail col-md-6 bg-white pt-5 mb-5'>
 				<center>
 					<div class="bg-white circle-icon d-flex justify-content-center align-items-center">
 						<i class="fas fa-user-tie fa-9x"></i>
@@ -101,25 +104,26 @@ echo <<< BODY
 									<h4>Change Date Of Birth</h4>
 									<div class='md-form'>
 										<i class='fas fa-calendar-day prefix purple-text'></i>
-										<input type='text'class='form-control pl-2' name='dob' onfocus="(this.type='date')" onblur="(this.type='text')" autocomplete='off' id="dob" placeholder='Date Of Birth' value='{$_SESSION['user']->getDob()}'/>
-											<div class='text-danger ml-5'>$errorMessage[4]</div>
+										<input type='text'class='form-control pl-2' name='dob' onfocus="this.type='date'" onblur="(this.type='text')" autocomplete='off' id="dob" placeholder='Date Of Birth' value='{$_SESSION['user']->getDob()}' />
+											<div class='text-danger ml-5'>$errorMessage[0]</div>
 									</div>
 								</div>
 								<div class="mt-5">
 									<h4>Change Password</h4>
 									<div class='md-form'>
 										<i class='fas fa-key prefix purple-text'></i>
-										<input mdbActive class='form-control pl-2 pwd' id ='oldPwd' type='password' name='pwd1' autocomplete='off' placeholder='Old Password' value='$_POST[pwd1]' />
-											<div class='text-danger ml-5'>$errorMessage[3]</div>
+										<input mdbActive class='form-control pl-2 pwd' id ='oldPwd' type='password' name='pwd1' autocomplete='off' placeholder='Old Password' value='$pwd1' onkeyup=validatePwd() />
+											<div class='text-danger ml-5'>$errorMessage[1]</div>
 									</div>
 									<div class='md-form'>
 										<i class='fas fa-key prefix purple-text'></i>
-										<input mdbActive class='form-control pl-2 pwd' id ='newPwd' type='password' name='pwd2' autocomplete='off' placeholder='New Password' value='$_POST[pwd2]'/>
+										<input mdbActive class='form-control pl-2 pwd' id ='newPwd' type='password' name='pwd2' autocomplete='off' placeholder='New Password' value='$pwd2' onkeyup=validatePwd() />
 										<div class='text-danger ml-5'>$errorMessage[2]</div>
 									</div>
 									<div class='md-form'>
 										<i class='fas fa-key prefix purple-text'></i>
-										<input mdbActive class='form-control pl-2 pwd' id ='newRePwd'type='password' name='pwd3' autocomplete='off' placeholder='Retype New Password' />	
+										<input mdbActive class='form-control pl-2 pwd' id ='newRePwd' value='$pwd3' type='password' name='pwd3' autocomplete='off' placeholder='Retype New Password' onkeyup=validatePwd() 
+										<div class='text-danger ml-5'>$errorMessage[3]</div>
 									</div>
 									<center class="pt-4">
 										<button class="btn purple-gradient text-white" id="scBtn" disabled>Save Changes</button> 
@@ -134,7 +138,6 @@ echo <<< BODY
 	</main>
 
 BODY;
-echo $wtf;
 		include("footer.php");
 		echo "</body>";
 	echo "</html>";

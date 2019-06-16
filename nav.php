@@ -10,7 +10,7 @@ $userPage =
         <li class='nav-item'>
             <a class='nav-link'>
                 <form class='form-inline' action='/action_page.php'>
-                    <input class='form-control mr-sm-2' type='text' placeholder='Search College'>
+                    <input class='form-control mr-sm-2' type='text' placeholder='Search Institute'>
                     <button type='submit' id='searchButton' class ='btn btn-success btn-rounded'>Search<i class='fas fa-search pl-2'></i></button>
                 </form>
             </a>
@@ -66,7 +66,7 @@ $nav =
                         <a class='nav-link' href='news.php'>News</a>
                     </li>
                     <li class='nav-item'>
-                        <a class='nav-link' href='college.php'>Colleges</a>
+                        <a class='nav-link' href='institute.php'>Institute</a>
                     </li>
                 </ul>
                 $userPage

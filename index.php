@@ -45,10 +45,10 @@ echo <<< BODY
 				</div>
 			</div>
 			</header>
-			<main class='mt-5 main'>
+			<main class='mt-5 mb-5 main'>
 				<div class='container' id='college_in_Malaysia'>
 					<section id='examples' class='text-center'>
-						<h2 class='mb-5 font-weight-bold'>Colleges in Malaysia</h2>
+						<h2 class='mb-5 font-weight-bold'>Institute in Malaysia</h2>
 						<div class='row'>
 							<div class='col-lg-4 col-md-12 mb-4'>
 								<div class='view overlay z-depth-1-half'>
@@ -100,7 +100,7 @@ echo <<< BODY
 								<h4 class='my-4 font-weight-bold'>Penang Medical College</h4>
 							</div>
 						</div>						
-						<a href='college.php' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</a>				
+						<a href='institute.php' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</a>				
 					</section>
 				</div>
 			</main>

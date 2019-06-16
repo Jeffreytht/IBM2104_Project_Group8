@@ -1,8 +1,9 @@
 <?php
-	$errorMessage;
-	$errorMessage = array_fill(0,5,"");
-
+	
 	require("models/users.php");
+	session_start();
+	startUser(5);
+
 	class Users extends User
 	{
 		public function validateData()
@@ -11,10 +12,11 @@
 			global $errorMessage;
 			$errorMessage = array_fill(0,5,"");
 
-			$this->validateEmail($is_valid);
-			$this->validateName($is_valid);
-			$this->validatePwd($is_valid);
-			$this->validateDob($is_valid);
+			$this->validateName($is_valid, 0);
+			$this->validateEmail($is_valid, 1);
+			$this->validatePwd($is_valid, 2);
+			$this->validateRetypePwd($is_valid,3);
+			$this->validateDob($is_valid, 4);
 
 			if($is_valid)
 				$this->saveResult();
@@ -24,18 +26,25 @@
 		{
 			$conn = new mysqli(self::server, self::user, self::password, self::db);
 			if($conn->connect_error)
-			{
 				die ("Connection Failed".$conn->connect_error);
-			}
 
 			$data = array($this->username,$this->email,$this->pwd,$this->dob);
+
 			foreach($value as $data)
 				$value = $conn->real_escape_string($value);
 
 			$sql = "CALL InsertUser(\"$data[0]\", \"$data[1]\", \"$data[2]\", \"$data[3]\");";
+
 			if($conn->query($sql)===TRUE)
 			{
 				$is_register = TRUE;
+				$sql = "CALL SelectAllUserDetails(\"$this->username\")";
+			    $result = $conn->query($sql);
+			    $userDetail = $result->fetch_assoc();
+			    $user = new User();
+			    $user->assignUser($userDetail);
+			    $_SESSION['user'] = $user;
+
 				echo "<script>";
 				echo "alert('Register Successfully');";
 				echo "window.location.replace(\"index.php\");";
