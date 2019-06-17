@@ -10,6 +10,7 @@ require("models/users.php");
 			echo "<body class='bg-light h-100'>";
 			include("nav.php");
 $self = htmlspecialchars($_SERVER['PHP_SELF']);
+
 echo <<<BODY
 	<main class='main'>
 	<div class='container d-flex justify-content-center'>
@@ -27,17 +28,18 @@ echo <<<BODY
 						      	<a class="nav-link active" data-toggle="tab" href="#overview">Overview</a>
 						    </li>
 						    <li class="nav-item">
-						      	<a class="nav-link" data-toggle="tab" href="#course">Course</a>
+						      	<a class="nav-link " data-toggle="tab" href="#course">Course</a>
 						    </li>
 						    <li class="nav-item">
-						      	<a class="nav-link" data-toggle="tab" href="#gallery">Gallery</a>
+						      	<a class="nav-link" data-toggle="tab" href="#gallery" >Gallery</a>
 						    </li>
 					  	</ul>
 			  		</nav>	
 		  		</div>
 			</div>
-			<div class="rounded border tab-content mt-2">
-	  			<div class="tab-pane container active p-3" id="overview">
+			<div class="rounded border tab-content mt-2 mb-5">
+	  			<div class="tab-pane active container p-3" id="overview">
+	  			<div class="row"><div class="col-md-4"  id="loadGallery"></div></div>
 	  				<div class="row">
 	  					<div class="col-md-6 pl-0">
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
@@ -78,11 +80,134 @@ echo <<<BODY
 						</div>
 					</div>
 	  			</div>
-	  			<div class="tab-pane container fade p-3 bg-white border rounded" id="course">
-	  				course
+	  			<div class="tab-pane container fade px-4 py-3 bg-white border rounded" id="course">
+	  				<h5><i class="fas fa-book pr-2"></i>Course Available</h5>
+	  				<hr/>
+	  				<table class="table table-hover">
+		  				<thead>
+		  					<tr>	
+		  						<th>#</th>
+		  						<th>Course Name</th>
+		  						<th>Duration (Years)</th>
+		  						<th>Fees (RM)</th>
+		  					</tr>
+		  				</thead>
+		  				<tbody>
+		  					<tr>
+		  						<td>
+		  							1
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+		  					<tr>
+		  						<td>
+		  							2
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+		  					<tr>
+		  						<td>
+		  							3
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+		  					<tr>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+		  					<tr>
+		  						<td>
+		  							5
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+		  					<tr>
+		  						<td>
+		  							6
+		  						</td>
+		  						<td>
+		  							<h6>Computer Science</h6>
+		  						</td>
+		  						<td>
+		  							4
+		  						</td>
+		  						<td>
+		  							55,000
+		  						</td>
+		  					</tr>
+
+		  				</tbody>
+	  				</table>	
 	  			</div>
-	  			<div class="tab-pane container fade p-3 bg-white border rounded" id="gallery">
-	  				gallery
+	  			<div class="tab-pane container fade px-4 py-3 bg-white border rounded" id="gallery">
+	  				<h5><i class="far fa-images pr-2"></i>Gallery</h5>
+	  				<hr/>
+	  				<div class="row mt-2">
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/1.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/2.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/3.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+
+	  				</div>
+	  				<div class="row mt-2">
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/1.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/2.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
+							<img src="images/instituteDetail/3.jpg" class="galImage rounded" style="min-width:100%;" >
+	  					</div>
+	  				</div>
+
 	  			</div>
 			</div>		
 		</div>

@@ -97,6 +97,9 @@ function click5()
 	$("#starForm").submit();
 }
 
+var imageWidth;
+
+
 $(document).ready(function(){
 
 	$("#star1").mouseover(addStar1);
@@ -114,4 +117,6 @@ $(document).ready(function(){
 	$("#star3").click(click3);
 	$("#star4").click(click4);
 	$("#star5").click(click5);
+	imageWidth = $("#loadGallery").width();
+	$(".galImage").height(imageWidth);
 });

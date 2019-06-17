@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2019 at 05:20 PM
+-- Generation Time: Jun 17, 2019 at 12:08 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.12
 
@@ -194,6 +194,79 @@ INSERT INTO `course` (`course_id`, `course_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `gallery`
+--
+
+CREATE TABLE `gallery` (
+  `image_id` bigint(20) UNSIGNED NOT NULL,
+  `image_path` text NOT NULL,
+  `news_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `institute`
+--
+
+CREATE TABLE `institute` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `institute_name` varchar(100) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `address_url` varchar(255) NOT NULL,
+  `state_id` int(6) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `institute_course`
+--
+
+CREATE TABLE `institute_course` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `course_id` int(6) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `institute_user`
+--
+
+CREATE TABLE `institute_user` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(6) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `news`
+--
+
+CREATE TABLE `news` (
+  `news_id` bigint(20) UNSIGNED NOT NULL,
+  `content` text,
+  `news_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `institute_id` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rate`
+--
+
+CREATE TABLE `rate` (
+  `user_id` int(6) UNSIGNED NOT NULL,
+  `institute_id` int(6) UNSIGNED NOT NULL,
+  `rating` int(1) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `role`
 --
 
@@ -262,12 +335,13 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `user_name`, `email`, `pwd`, `dob`, `recent_changes`) VALUES
 (11, 'jeffreytan', 'tanhoetheng@gmail.com', '12345abcde', '2000-04-12', '2019-06-16 06:48:13'),
-(12, 'laukuansin', 'laukuansin@gmail.com', '12345abcde', '2000-03-18', '2019-06-15 16:51:10'),
+(12, 'laukuansin', 'laukuansin@gmail.com', '12345abcde', '2000-03-05', '2019-06-17 00:39:37'),
 (13, 'chuangjingyee', 'cjy@gmail.com', '12345abcde', '2000-12-12', '2019-06-13 15:07:31'),
 (14, 'peyxinyee', 'pxy@gmail.com', '12345abcde', '1212-12-12', '2019-06-13 15:15:36'),
-(15, 'luchunhung', 'lch@gmail.com', '12345abcde', '2000-12-12', '2019-06-14 13:15:40'),
 (16, 'amanda', 'amanda@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:31:42'),
-(19, 'jeffreytht', 'jeffrey@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:45:42');
+(19, 'jeffreytht', 'jeffrey@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:45:42'),
+(20, 'dannylu', 'dannylu@gmail.com', 'qw1234567890', '2000-02-18', '2019-06-17 00:11:56'),
+(21, 'chuang jing yee', 'p18010120@student.newinti.edu.my', '12345abcde', '2000-04-15', '2019-06-17 06:25:19');
 
 -- --------------------------------------------------------
 
@@ -287,11 +361,12 @@ CREATE TABLE `user_role` (
 INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 (11, 1),
 (12, 2),
-(15, 3),
 (13, 2),
 (14, 2),
 (16, 3),
-(19, 3);
+(19, 3),
+(20, 3),
+(21, 3);
 
 --
 -- Indexes for dumped tables
@@ -302,6 +377,48 @@ INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 --
 ALTER TABLE `course`
   ADD PRIMARY KEY (`course_id`);
+
+--
+-- Indexes for table `gallery`
+--
+ALTER TABLE `gallery`
+  ADD PRIMARY KEY (`image_id`),
+  ADD KEY `news_id` (`news_id`);
+
+--
+-- Indexes for table `institute`
+--
+ALTER TABLE `institute`
+  ADD PRIMARY KEY (`institute_id`),
+  ADD KEY `state_id` (`state_id`);
+
+--
+-- Indexes for table `institute_course`
+--
+ALTER TABLE `institute_course`
+  ADD KEY `institute_id` (`institute_id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
+-- Indexes for table `institute_user`
+--
+ALTER TABLE `institute_user`
+  ADD KEY `institute_id` (`institute_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `news`
+--
+ALTER TABLE `news`
+  ADD PRIMARY KEY (`news_id`),
+  ADD KEY `institute_id` (`institute_id`);
+
+--
+-- Indexes for table `rate`
+--
+ALTER TABLE `rate`
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `institute_id` (`institute_id`);
 
 --
 -- Indexes for table `role`
@@ -339,6 +456,24 @@ ALTER TABLE `course`
   MODIFY `course_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
+-- AUTO_INCREMENT for table `gallery`
+--
+ALTER TABLE `gallery`
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `institute`
+--
+ALTER TABLE `institute`
+  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `news`
+--
+ALTER TABLE `news`
+  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `role`
 --
 ALTER TABLE `role`
@@ -354,11 +489,44 @@ ALTER TABLE `state`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `gallery`
+--
+ALTER TABLE `gallery`
+  ADD CONSTRAINT `gallery_ibfk_1` FOREIGN KEY (`news_id`) REFERENCES `news` (`news_id`);
+
+--
+-- Constraints for table `institute_course`
+--
+ALTER TABLE `institute_course`
+  ADD CONSTRAINT `institute_course_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
+  ADD CONSTRAINT `institute_course_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`);
+
+--
+-- Constraints for table `institute_user`
+--
+ALTER TABLE `institute_user`
+  ADD CONSTRAINT `institute_user_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
+  ADD CONSTRAINT `institute_user_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `news`
+--
+ALTER TABLE `news`
+  ADD CONSTRAINT `news_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`);
+
+--
+-- Constraints for table `rate`
+--
+ALTER TABLE `rate`
+  ADD CONSTRAINT `rate_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `rate_ibfk_2` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`);
 
 --
 -- Constraints for table `user_role`
