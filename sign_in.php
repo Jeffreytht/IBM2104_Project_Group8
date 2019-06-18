@@ -1,69 +1,89 @@
 <?php
 
 	require("models/users.php");
+	require("models/normalUser.php");
+	require("models/admin.php");
+	require("models/superadmin.php");
 	session_start();
 
-	if(isset($_SESSION['user']))
-	{
+	define("SERVER", "localhost");
+	define("USER","root");
+	define("PASS","");
+	define("DB","college_portal");
+
+	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
 		header("Location:index.php");
-	}
 
 	$errorMessage;
 	$errorMessage = array_fill(0,2,"");
 
-	class Users extends User
-	{
-		public function validateData()	
-		{
-			$conn = new mysqli(self::server, self::user, self::password, self::db);
-			if($conn->connect_error)
-			{
-				die("Connection fail". $conn->connect_error);
-			}
-			
-			$sql = "CALL AuthenticateUser(\"$this->username\")";
-			$result = $conn->query($sql);
-
-			if($result->num_rows == 0)
-			{
-				global $errorMessage;
-				$errorMessage[0] = "Invalid Username.";
-			}
-			else 
-			{
-				$selectedUser = $result->fetch_assoc();
-				$conn->close();
-				global $errorMessage;
-
-				if($selectedUser['user_name'] == $this->username && $selectedUser['pwd'] == $this->pwd)
-				{
-					$conn = new mysqli(self::server, self::user, self::password, self::db);
-				    $sql = "CALL SelectAllUserDetails(\"$this->username\")";
-				    $result = $conn->query($sql);
-				    $userDetail = $result->fetch_assoc();
-				    $user = new User();
-				    $user->assignUser($userDetail);
-				    $_SESSION['user'] = $user;
 	
-					echo "<script>";
-					echo "alert('Login Successfully');";
-					echo "window.location.replace(\"index.php\");";
-					echo "</script>";
-				}
-				else
-					$errorMessage[1] = "Invalid password";
-			}
-		}
-	}
-
-	$user = new Users();
+	$user = new NormalUser();
 	$self = htmlspecialchars("$_SERVER[PHP_SELF]");
 	
 	if($_POST)
 	{
 		$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
 		$user->setPwd(htmlspecialchars($_POST["pwd"]));
-		$user->validateData();
+
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+		if($conn->connect_error)
+			die("Connection fail". $conn->connect_error);
+		
+		$sql = "CALL AuthenticateUser(\"{$user->getUsername()}\")";
+		$result = $conn->query($sql);
+
+		if($result->num_rows == 0)
+		{
+			global $errorMessage;
+			$errorMessage[0] = "Invalid Username.";
+		}
+		else 
+		{
+			$selectedUser = $result->fetch_assoc();
+			$conn->close();
+			global $errorMessage;
+
+			if($selectedUser['user_name'] == $user->getUsername() && $selectedUser['pwd'] == $user->getPwd())
+			{
+				$conn = new mysqli(SERVER,USER,PASS,DB);
+			    $sql = "CALL SelectAllUserDetails(\"{$user->getUsername()}\")";
+			    $result = $conn->query($sql);
+			    $userDetail = $result->fetch_assoc();
+
+			    switch($userDetail['role_id'])
+			    {
+			    	case 1:
+			    		$superAdmin = new SuperAdmin();
+			    		$SuperAdmin->assginUser($userDetail);
+			    		$_SESSION['superAdmin'] = $admin;
+			    		$_SESSION['role'] = $userDetail['role_id'];
+			    	break;
+
+			    	case 2:
+			    		$admin = new Admin();
+			    		$admin->assginUser($userDetail);
+			    		$_SESSION['admin'] = $admin;
+			    		$_SESSION['role'] = $userDetail['role_id'];
+			    	break;
+
+			    	case 3:
+			    		$normalUser = new NormalUser();
+			   			$normalUser->assignUser($userDetail);
+			    		$_SESSION['user'] = $normalUser;
+			    		$_SESSION['role'] = $userDetail['role_id'];
+			    	break;
+			    }
+
+				echo "<script>";
+					echo "alert('Login Successfully');";
+					echo "window.location.replace(\"index.php\");";
+				echo "</script>";
+			}
+
+			else
+				$errorMessage[1] = "Invalid password";
+		}
 	}
 
 	echo "<!DOCTYPE html>";

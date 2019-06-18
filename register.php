@@ -1,63 +1,87 @@
 <?php
 	
 	require("models/users.php");
+	require("models/normalUser.php");
+	require("models/admin.php");
+	require("models/superadmin.php");
 	session_start();
+
 	startUser(5);
+	define("SERVER", "localhost");
+	define("USER","root");
+	define("PASS","");
+	define("DB","college_portal");
 
-	class Users extends User
+	$user = new NormalUser();
+
+	function validateData()
 	{
-		public function validateData()
-		{
-			$is_valid = TRUE;
-			global $errorMessage;
-			$errorMessage = array_fill(0,5,"");
+		$is_valid = TRUE;
+		global $errorMessage;
+		global $user;
+		$errorMessage = array_fill(0,5,"");
+		
+		$user->validateName($is_valid, 0);
+		$user->validateEmail($is_valid, 1);
+		$user->validatePwd($is_valid, 2);
+		$user->validateRetypePwd($is_valid,3);
+		$user->validateDob($is_valid, 4);
 
-			$this->validateName($is_valid, 0);
-			$this->validateEmail($is_valid, 1);
-			$this->validatePwd($is_valid, 2);
-			$this->validateRetypePwd($is_valid,3);
-			$this->validateDob($is_valid, 4);
-
-			if($is_valid)
-				$this->saveResult();
-		}
-
-		private function saveResult()
-		{
-			$conn = new mysqli(self::server, self::user, self::password, self::db);
-			if($conn->connect_error)
-				die ("Connection Failed".$conn->connect_error);
-
-			$data = array($this->username,$this->email,$this->pwd,$this->dob);
-
-			foreach($value as $data)
-				$value = $conn->real_escape_string($value);
-
-			$sql = "CALL InsertUser(\"$data[0]\", \"$data[1]\", \"$data[2]\", \"$data[3]\");";
-
-			if($conn->query($sql)===TRUE)
-			{
-				$is_register = TRUE;
-				$sql = "CALL SelectAllUserDetails(\"$this->username\")";
-			    $result = $conn->query($sql);
-			    $userDetail = $result->fetch_assoc();
-			    $user = new User();
-			    $user->assignUser($userDetail);
-			    $_SESSION['user'] = $user;
-
-				echo "<script>";
-				echo "alert('Register Successfully');";
-				echo "window.location.replace(\"index.php\");";
-				echo "</script>";
-			}
-			else
-				"Error".$conn->error;;
-
-			$conn->close();
-		}
+		if($is_valid)
+			saveResult();
 	}
 
-	$user = new Users();
+	function saveResult()
+	{
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+		global $user;
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$data = array($user->getUsername(),$user->getEmail(),$user->getPwd(),$user->getDob());
+
+		foreach($value as $data)
+			$value = $conn->real_escape_string($value);
+
+		$sql = "CALL InsertUser(\"$data[0]\", \"$data[1]\", \"$data[2]\", \"$data[3]\");";
+
+		if($conn->query($sql)===TRUE)
+		{
+			$is_register = TRUE;
+			$sql = "CALL SelectAllUserDetails(\"$this->username\")";
+		    $result = $conn->query($sql);
+		    $userDetail = $result->fetch_assoc();
+		    switch($userDetail['role_id'])
+		    {
+		    	case 1:
+		    		$superAdmin = new SuperAdmin();
+		    		$SuperAdmin->assginUser($userDetail);
+		    		$_SESSION['superAdmin'] = $admin;
+		    		$_SESSION['role'] = $userDetail['role_id'];
+		    	break;
+
+		    	case 2:
+		    		$admin = new Admin();
+		    		$admin->assginUser($userDetail);
+		    		$_SESSION['admin'] = $admin;
+		    		$_SESSION['role'] = $userDetail['role_id'];
+		    	break;
+
+		    	case 3:
+		    		$normalUser = new NormalUser();
+		   			$normalUser->assignUser($userDetail);
+		    		$_SESSION['user'] = $normalUser;
+		    		$_SESSION['role'] = $userDetail['role_id'];
+		    	break;
+		    }
+		}
+		else
+			"Error".$conn->error;;
+
+		$conn->close();
+	}
+
+	
 	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
 
 	if($_POST)
@@ -67,8 +91,8 @@
 		$user->setPwd(htmlspecialchars($_POST['pwd']));
 		$user->setRetypePwd(htmlspecialchars($_POST['retypePwd']));
 		$user->setDob(htmlspecialchars($_POST['dob']));
-		$user->validateData();
 	}
+	validateData();
 
 echo "<!DOCTYPE html>";
 	echo "<html lang='en'>";

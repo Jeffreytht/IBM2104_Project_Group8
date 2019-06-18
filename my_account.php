@@ -1,6 +1,9 @@
 <?php
 
 require("models/users.php");
+require("models/normalUser.php");
+require("models/admin.php");
+require("models/superadmin.php");
 session_start();
 
 

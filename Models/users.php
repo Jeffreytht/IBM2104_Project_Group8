@@ -1,14 +1,13 @@
 <?php
 	$errorMessage;
 	
-
 	function startUser($num)
 	{
 		global $errorMessage;
 		$errorMessage = array_fill(0,$num,"");
 	}
 
-	class User
+	abstract class User
 	{
 		protected $userID;
 		protected $username;
@@ -16,11 +15,15 @@
 		protected $pwd;
 		protected $dob;	
 		protected $roleID;
+
 		const server = "localhost";
 		const user = "root";
 		const password="";
 		const db = "college_portal";
 		
+		/**
+			Getter and setter method
+		**/
 		public function setUsername($username){$this->username = $username;}
 		public function setEmail($email){$this->email = $email;}
 		public function setPwd($pwd){$this->pwd = $pwd;}
@@ -32,6 +35,11 @@
 		public function getPwd(){return $this->pwd;}
 		public function getRetypePwd(){return $this->retypePwd;}
 		public function getdob(){return $this->dob;}
+		public function getRoleId(){return $this->roleID;}
+
+		/**
+			Print date in readable format
+		**/
 		public function printDate()
 		{
 			$month = array(
@@ -49,22 +57,15 @@
 				"12" =>"December"
 				);
 
-				$dob = explode("-", $_SESSION['user']->getDOB());
-				$dob[1] = $month[$dob[1]];
+			$dob = explode("-", $_SESSION['user']->getDOB());
+			$dob[1] = $month[$dob[1]];
 
-				return $dob[2]." ".$dob[1]." ".$dob[0];
+			return $dob[2]." ".$dob[1]." ".$dob[0];
 		}
 
-		public function __construct()
-		{			
-			$this->username = "";
-			$this->email = "";
-			$this->pwd = "";
-			$this->retypePwd = "";
-			$this->dob = "";
-			$this->roleID = NULL;		
-		}
-
+		/**
+			Assign value to the object attribute from the database value
+		**/
 		public function assignUser($user)
 		{	
 			$this->userID = $user['user_id'];		
@@ -75,6 +76,13 @@
 			$this->roleID = $user['role_id'];		
 		}
 
+		/**
+			Validate name
+			1. Cannot empty
+			2. Cannot exceeds 20 characters
+			3. Cannot contain whitespace
+			4. Cannot duplicate
+		**/
 		public function validateName(&$is_valid, $index)
 		{
 			if(empty($this->username))
@@ -100,10 +108,11 @@
 			{
 				$conn = new mysqli(self::server, self::user, self::password, self::db);
 				$name = $conn->real_escape_string($this->username);
+
 				$sql = "CALL SelectUser(\"user_name\",\"$name\")";
 				$result = $conn->query($sql);
 
-				if($result->num_rows > 0 )
+				if($result->num_rows > 0)
 				{		
 					global $errorMessage;
 					$errorMessage[0] = "Username had been taken";
@@ -115,6 +124,12 @@
 			}
 		}
 
+		/**
+			Validate Email
+			1. Cannot be empty
+			2. Must be in email format
+			3. Cannot be duplicate
+		**/
 		public function validateEmail(&$is_valid, $index)
 		{
 			if(empty($this->email))
@@ -135,6 +150,7 @@
 			{
 				$conn = new mysqli(self::server, self::user, self::password, self::db);
 				$email = $conn->real_escape_string($this->email);
+				
 				$sql = "CALL SelectUser(\"email\",\"$email\")";
 				$result = $conn->query($sql);
 
@@ -149,6 +165,12 @@
 			}
 		}
 
+		/**
+			Validate password
+			1. Cannot be empty
+			2. Must contain at least 8 characters
+			3. Must contain alphanumeric characters
+		**/
 		public function validatePwd(&$is_valid, $index)
 		{
 			if(empty($this->pwd))
@@ -183,6 +205,10 @@
 			}
 		}
 
+		/**
+			Validate retype password
+			1. Must be same as password
+		**/
 		public function validateRetypePwd(&$is_valid, $index)
 		{
 			if($this->pwd != $this->retypePwd)
@@ -194,6 +220,11 @@
 			}
 		}
 
+		/**
+			Validate date of birth
+			1. Cannot be empty
+			2. Cannot be in future
+		**/
 		public function validateDob(&$is_valid, $index)
 		{
 			if(empty($this->dob))

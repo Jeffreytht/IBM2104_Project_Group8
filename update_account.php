@@ -1,6 +1,9 @@
 <?php
 
 require("models/users.php");
+require("models/normalUser.php");
+require("models/admin.php");
+require("models/superadmin.php");
 session_start();
 startUser(4);
 
@@ -16,7 +19,23 @@ if($_POST)
 
 	$conn = mysqli_connect("localhost","root","","college_portal");
 	
-	$user = new User();
+	$user;
+	switch($_SESSION['role'])
+	{
+		case 1:
+		global $user;
+		$user = new SuperAdmin();
+		break;
+		case 2:
+		global $user;
+		$user = new Admin();
+		break;
+		case 3:
+		global $user;
+		$user = new NormalUser();
+		break;
+	}
+
 	$userID = $_SESSION['user']->getUserID();
 	$is_valid = TRUE;
 

@@ -1,12 +1,18 @@
 <?php
+require("models/users.php");
+require("models/normalUser.php");
+require("models/admin.php");
+require("models/superadmin.php");
+session_start();
 	echo "<!DOCTYPE html>";
 	echo "<html lang='en'>";
 		echo "<head>";
 			include("header.html");
 		echo "</head>";
 		echo "<body class='bg-light' >";
+			include("nav.php");
 			echo "<main class='main'>";
-				include("nav.php");
+				
 				?>
 				<div class='container-fluid d-flex justify-content-center'>
 

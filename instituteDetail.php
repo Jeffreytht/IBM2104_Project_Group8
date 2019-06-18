@@ -1,5 +1,8 @@
 <?php
-require("models/users.php");
+	require("models/users.php");
+	require("models/normalUser.php");
+	require("models/admin.php");
+	require("models/superadmin.php");
 	session_start();
 	echo "<!DOCTYPE html>";
 		echo "<html lang='en' class='h-100'>";
@@ -11,6 +14,43 @@ require("models/users.php");
 			include("nav.php");
 $self = htmlspecialchars($_SERVER['PHP_SELF']);
 
+$conn = mysqli_connect("localhost","root","","college_portal");
+$sql = "CALL SelectInstituteCourse(2)";
+$result = $conn->query($sql);
+
+$course= "";
+
+$i = 0;
+
+while($courseDet = $result -> fetch_assoc())
+{
+$i++;
+$course .=
+<<<COURSE
+	<tr>
+		<td>
+			$i
+		</td>
+		<td>
+			<h6>$courseDet[course_name]</h6>
+		</td>
+		<td>
+			$courseDet[duration]
+		</td>
+		<td>
+			$courseDet[fee]
+		</td>
+	</tr>
+COURSE;
+}
+$conn->close();
+
+$conn = mysqli_connect("localhost","root","","college_portal");
+$sql = "CALL SelectInstituteDetails(2)";
+$result = $conn->query($sql);
+$instituteDet = $result ->fetch_assoc();
+$conn->close();
+
 echo <<<BODY
 	<main class='main'>
 	<div class='container d-flex justify-content-center'>
@@ -19,8 +59,14 @@ echo <<<BODY
 				<img src="//localhost/php_project/images/cover/inti.jpg" height=300px width=100% alt=""/>
 
 				<div class='mask d-flex mr-auto'>		
-					<img src="//localhost/php_project/images/logo/inti.jpg" class='circle-image ml-5 mb-3 mt-auto' style="z-index:1;"/>
+					<img src="//localhost/php_project/images/profile/inti.jpg" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
+
 				</div>
+
+				<div class='mask d-flex justify-content-center'>		
+					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">$instituteDet[institute_name]</h1>
+				</div>
+
 				<div class='mask d-flex'>
 					<nav class="bg-white mt-auto col-md-12">
 						<ul class="nav nav-tabs" style="padding-left:230px;">
@@ -41,7 +87,7 @@ echo <<<BODY
 	  			<div class="tab-pane active container p-3" id="overview">
 	  			<div class="row"><div class="col-md-4"  id="loadGallery"></div></div>
 	  				<div class="row">
-	  					<div class="col-md-6 pl-0">
+	  					<div class="col-md-5 pl-0">
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
 	  							<h5><i class="far fa-thumbs-up pr-2"></i>Rate Us</h5>
 	  							<hr />
@@ -61,21 +107,21 @@ echo <<<BODY
 		  						<h5><i class="far fa-clipboard pr-2"></i>Details</h5>
 		  						<hr/>
 		  						<div class="mb-3">
-			  						<span>Address:</span><p><a href="https://goo.gl/maps/kx4bFj8DGSf42p4f9">1-Z, Lebuh Bukit Jambul, Bukit Jambul, 11900 Bayan Lepas, Pulau Pinang</a></p>
-			  						<iframe class="border rounded" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy" frameborder="0" style="border:0" allowfullscreen></iframe>
+			  						<span>Address:</span><p><a href="$instituteDet[address_url]">$instituteDet[address]</a></p>
+			  						<iframe class="border rounded" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
 		  						</div>
 		  						<div class="mb-3">
-		  							<span class="mr-2">State:</span><a href=https://goo.gl/maps/Ut1mvNnb3FFgnQv6A">Penang</a>
+		  							<span class="mr-2">State:</span><a href="$instituteDet[state_url]">$instituteDet[state_name]</a>
 		  						</div>
-		  						<h6>Course Offer: 100</h6>
+		  						<h6>Course Offer: $i</h6>
 	  						</div>
 	  					</div>
   		
-  						<div class="col-md-6 px-0">
-		  					<div class="bg-white border rounded px-4 py-3" style="min-height:567px;">
+  						<div class="col-md-7 px-0">
+		  					<div class="bg-white border rounded px-4 py-3" style="min-height:591px;">
 		  						<h5><i class="far fa-newspaper pr-2"></i>News</h5>
 		  						<hr/>
-		  						Bla Bla Bla
+		  						
   							</div>
 						</div>
 					</div>
@@ -93,91 +139,7 @@ echo <<<BODY
 		  					</tr>
 		  				</thead>
 		  				<tbody>
-		  					<tr>
-		  						<td>
-		  							1
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-		  					<tr>
-		  						<td>
-		  							2
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-		  					<tr>
-		  						<td>
-		  							3
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-		  					<tr>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-		  					<tr>
-		  						<td>
-		  							5
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-		  					<tr>
-		  						<td>
-		  							6
-		  						</td>
-		  						<td>
-		  							<h6>Computer Science</h6>
-		  						</td>
-		  						<td>
-		  							4
-		  						</td>
-		  						<td>
-		  							55,000
-		  						</td>
-		  					</tr>
-
+		  					$course
 		  				</tbody>
 	  				</table>	
 	  			</div>
@@ -196,18 +158,6 @@ echo <<<BODY
 	  					</div>
 
 	  				</div>
-	  				<div class="row mt-2">
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/1.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/2.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/3.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-	  				</div>
-
 	  			</div>
 			</div>		
 		</div>
