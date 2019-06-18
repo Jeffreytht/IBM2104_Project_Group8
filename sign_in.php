@@ -1,9 +1,10 @@
 <?php
 
-	require("models/users.php");
-	require("models/normalUser.php");
-	require("models/admin.php");
-	require("models/superadmin.php");
+	require_once("models/users.php");
+	require_once("models/normalUser.php");
+	require_once("models/admin.php");
+	require_once("models/superadmin.php");
+	require_once("models/institute.php");
 	session_start();
 
 	define("SERVER", "localhost");
@@ -55,14 +56,15 @@
 			    {
 			    	case 1:
 			    		$superAdmin = new SuperAdmin();
-			    		$SuperAdmin->assginUser($userDetail);
+			    		$SuperAdmin->assignUser($userDetail);
 			    		$_SESSION['superAdmin'] = $admin;
 			    		$_SESSION['role'] = $userDetail['role_id'];
 			    	break;
 
 			    	case 2:
 			    		$admin = new Admin();
-			    		$admin->assginUser($userDetail);
+			    		$admin->assignUser($userDetail);
+			    		$admin->assignAdmin();
 			    		$_SESSION['admin'] = $admin;
 			    		$_SESSION['role'] = $userDetail['role_id'];
 			    	break;

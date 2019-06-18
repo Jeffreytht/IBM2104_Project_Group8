@@ -43,7 +43,7 @@ if(isset($_SESSION['user'])||isset($_SESSION['admin'])||isset($_SESSION['superAd
 
         case 2:
             $conn = new mysqli("localhost","root","","college_portal");
-            $sql = "CALL SelectInstituteDetails(SELECT institute_id FROM institute_user WHERE user_id = {$_SESSION['user']->getUserID()})";
+            $sql = "CALL SelectInstituteDetails(SELECT institute_id FROM institute_user WHERE user_id = {$_SESSION['admin']->getUserID()})";
                 
 
             $dropdown ='

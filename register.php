@@ -1,24 +1,31 @@
 <?php
-	
+
 	require("models/users.php");
 	require("models/normalUser.php");
 	require("models/admin.php");
 	require("models/superadmin.php");
+	require("models/institute.php");
+	require("models/news.php");
 	session_start();
-
 	startUser(5);
+
+	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
+		header("Location: index.php");
+
 	define("SERVER", "localhost");
 	define("USER","root");
 	define("PASS","");
 	define("DB","college_portal");
 
 	$user = new NormalUser();
+	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
 
 	function validateData()
 	{
-		$is_valid = TRUE;
 		global $errorMessage;
 		global $user;
+
+		$is_valid = TRUE;
 		$errorMessage = array_fill(0,5,"");
 		
 		$user->validateName($is_valid, 0);
@@ -33,24 +40,20 @@
 
 	function saveResult()
 	{
-		$conn = new mysqli(SERVER,USER,PASS,DB);
 		global $user;
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+		
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
-
-		$data = array($user->getUsername(),$user->getEmail(),$user->getPwd(),$user->getDob());
-
-		foreach($value as $data)
-			$value = $conn->real_escape_string($value);
 
 		$sql = "CALL InsertUser(\"$data[0]\", \"$data[1]\", \"$data[2]\", \"$data[3]\");";
 
 		if($conn->query($sql)===TRUE)
 		{
-			$is_register = TRUE;
-			$sql = "CALL SelectAllUserDetails(\"$this->username\")";
+			$sql = "CALL SelectAllUserDetails(\"$data[0]\")";
 		    $result = $conn->query($sql);
 		    $userDetail = $result->fetch_assoc();
+
 		    switch($userDetail['role_id'])
 		    {
 		    	case 1:
@@ -74,25 +77,31 @@
 		    		$_SESSION['role'] = $userDetail['role_id'];
 		    	break;
 		    }
+
+		    echo "<script>";
+				echo "alert('Register Successfully');";
+				echo "window.location.replace(\"index.php\");";
+			echo "</script>";
 		}
 		else
-			"Error".$conn->error;;
+			echo "Error".$conn->error;
 
 		$conn->close();
 	}
 
 	
-	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
-
+	
 	if($_POST)
 	{
+		global $user;
 		$user->setUsername(htmlspecialchars(strtolower($_POST['username'])));
 		$user->setEmail(htmlspecialchars(strtolower($_POST['email'])));
 		$user->setPwd(htmlspecialchars($_POST['pwd']));
 		$user->setRetypePwd(htmlspecialchars($_POST['retypePwd']));
 		$user->setDob(htmlspecialchars($_POST['dob']));
+		validateData();
 	}
-	validateData();
+	
 
 echo "<!DOCTYPE html>";
 	echo "<html lang='en'>";

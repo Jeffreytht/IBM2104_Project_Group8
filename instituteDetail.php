@@ -1,48 +1,43 @@
 <?php
+
 	require("models/users.php");
 	require("models/normalUser.php");
 	require("models/admin.php");
 	require("models/superadmin.php");
 	session_start();
-	echo "<!DOCTYPE html>";
-		echo "<html lang='en' class='h-100'>";
-			echo "<head>";
-				include("header.html");	
-				echo "<script src='style/style.js'></script>";					
-			echo "</head>";
-			echo "<body class='bg-light h-100'>";
-			include("nav.php");
-$self = htmlspecialchars($_SERVER['PHP_SELF']);
 
-$conn = mysqli_connect("localhost","root","","college_portal");
-$sql = "CALL SelectInstituteCourse(2)";
-$result = $conn->query($sql);
+	$self = htmlspecialchars($_SERVER['PHP_SELF']);
 
-$course= "";
+	$conn = mysqli_connect("localhost","root","","college_portal");
+	$sql = "CALL SelectInstituteCourse(2)";
+	$result = $conn->query($sql);
 
-$i = 0;
+	$course= "";
+	$i = 0;
+	while($courseDet = $result -> fetch_assoc())
+	{
 
-while($courseDet = $result -> fetch_assoc())
-{
-$i++;
-$course .=
-<<<COURSE
-	<tr>
-		<td>
-			$i
-		</td>
-		<td>
-			<h6>$courseDet[course_name]</h6>
-		</td>
-		<td>
-			$courseDet[duration]
-		</td>
-		<td>
-			$courseDet[fee]
-		</td>
-	</tr>
+		$i++;
+		$course .=
+
+		<<<COURSE
+			<tr>
+				<td>
+					$i
+				</td>
+				<td>
+					<h6>$courseDet[course_name]</h6>
+				</td>
+				<td>
+					$courseDet[duration]
+				</td>
+				<td>
+					$courseDet[fee]
+				</td>
+			</tr>
 COURSE;
 }
+
 $conn->close();
 
 $conn = mysqli_connect("localhost","root","","college_portal");
@@ -50,6 +45,15 @@ $sql = "CALL SelectInstituteDetails(2)";
 $result = $conn->query($sql);
 $instituteDet = $result ->fetch_assoc();
 $conn->close();
+
+echo "<!DOCTYPE html>";
+		echo "<html lang='en' class='h-100'>";
+			echo "<head>";
+				include("header.html");	
+				echo "<script src='style/style.js'></script>";					
+			echo "</head>";
+			echo "<body class='bg-light h-100'>";
+			include("nav.php");
 
 echo <<<BODY
 	<main class='main'>
