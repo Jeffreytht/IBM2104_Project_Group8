@@ -61,15 +61,15 @@ echo <<<BODY
 				<div class='container d-flex justify-content-center'>
 		<div class='collegeDetail'>	
 			<div class="view border rounded" height=100%>
-				<img src="//localhost/php_project/images/cover/inti.jpg" height=300px width=100% alt=""/>
+				<img src="{$admin->getInstitute()->getCover()}" height=300px width=100% alt=""/>
 
 				<div class='mask d-flex mr-auto'>		
-					<img src="//localhost/php_project/images/profile/inti.jpg" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
+					<img src="{$admin->getInstitute()->getProfile()}" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
 
 				</div>
 
 				<div class='mask d-flex justify-content-center'>		
-					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">{$admin->getInstitute()->getInstituteName()}}</h1>
+					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">{$admin->getInstitute()->getInstituteName()}</h1>
 				</div>
 
 				<div class='mask d-flex'>
@@ -113,7 +113,7 @@ echo <<<BODY
 		  						<hr/>
 		  						<div class="mb-3">
 			  						<span>Address:</span><p><a href="{$admin->getInstitute()->getInstituteAddressURL()}">{$admin->getInstitute()->getInstituteAddress()}</a></p>
-			  						<iframe class="border rounded" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
+			  						<iframe class="border rounded" src="{$admin->getInstitute()->getInstituteIFrame()}" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
 		  						</div>
 		  						<div class="mb-3">
 		  							<span class="mr-2">State:</span><a href="{$admin->getInstitute()->getState()->getStateURL()}">{$admin->getInstitute()->getState()->getStateName()}</a>
@@ -168,8 +168,6 @@ echo <<<BODY
 		</div>
 	</div>
 	</main>
-
-			</main>
 BODY;
 
 				include("footer.php");

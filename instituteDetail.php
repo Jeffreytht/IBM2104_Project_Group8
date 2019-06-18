@@ -1,26 +1,33 @@
 <?php
+	
+	if(!$_GET)
+		header("Location:institute.php");
 
 	require("models/users.php");
 	require("models/normalUser.php");
 	require("models/admin.php");
 	require("models/superadmin.php");
+	require_once("models/institute.php");
 	session_start();
 
+	define("SERVER","localhost");
+	define("USER", "root");
+	define("PASS","");
+	define("DB","college_portal");
+
 	$self = htmlspecialchars($_SERVER['PHP_SELF']);
-
-	$conn = mysqli_connect("localhost","root","","college_portal");
-	$sql = "CALL SelectInstituteCourse(2)";
-	$result = $conn->query($sql);
-
 	$course= "";
 	$i = 0;
+
+	$conn = mysqli_connect(SERVER,USER,PASS,DB);
+	$sql = "CALL SelectInstituteCourse($_GET[id])";
+	$result = $conn->query($sql);
+
 	while($courseDet = $result -> fetch_assoc())
 	{
 
 		$i++;
-		$course .=
-
-		<<<COURSE
+		$course .= <<<COURSE
 			<tr>
 				<td>
 					$i
@@ -37,14 +44,26 @@
 			</tr>
 COURSE;
 }
+	$conn->close();
 
-$conn->close();
+	$conn = mysqli_connect("localhost","root","","college_portal");
+	$sql = "CALL SelectInstituteDetails($_GET[id])";
+	$result = $conn->query($sql);
 
-$conn = mysqli_connect("localhost","root","","college_portal");
-$sql = "CALL SelectInstituteDetails(2)";
-$result = $conn->query($sql);
-$instituteDet = $result ->fetch_assoc();
-$conn->close();
+	$institute = new Institute();
+	$institute->assignInstitute($result ->fetch_assoc());
+
+	$anotherConns = new mysqli(SERVER,USER,PASS,DB);
+	$sql = "SELECT g.image_path 
+			FROM institute_logo il, gallery g 
+			WHERE il.institute_id = $_GET[id] && g.image_id = il.image_id";
+
+	$anotherResult = $anotherConns->query($sql);
+	$selectedLogo = $anotherResult->fetch_assoc();
+	$anotherConns->close();
+
+	$institute->setInstituteLogo($selectedLogo['image_path']);
+	$conn->close();
 
 echo "<!DOCTYPE html>";
 		echo "<html lang='en' class='h-100'>";
@@ -60,15 +79,15 @@ echo <<<BODY
 	<div class='container d-flex justify-content-center'>
 		<div class='collegeDetail'>	
 			<div class="view border rounded" height=100%>
-				<img src="//localhost/php_project/images/cover/inti.jpg" height=300px width=100% alt=""/>
+				<img src="{$institute->getCover()}" height=300px width=100% alt=""/>
 
 				<div class='mask d-flex mr-auto'>		
-					<img src="//localhost/php_project/images/profile/inti.jpg" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
+					<img src="{$institute->getProfile()}" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
 
 				</div>
 
 				<div class='mask d-flex justify-content-center'>		
-					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">$instituteDet[institute_name]</h1>
+					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">{$institute->getInstituteName()}</h1>
 				</div>
 
 				<div class='mask d-flex'>
@@ -111,11 +130,11 @@ echo <<<BODY
 		  						<h5><i class="far fa-clipboard pr-2"></i>Details</h5>
 		  						<hr/>
 		  						<div class="mb-3">
-			  						<span>Address:</span><p><a href="$instituteDet[address_url]">$instituteDet[address]</a></p>
-			  						<iframe class="border rounded" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
+			  						<span>Address:</span><p><a href="{$institute->getInstituteAddressURL()}">{$institute->getInstituteAddress()}}</a></p>
+			  						<iframe class="border rounded" src="{$institute->getInstituteIFrame()}" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
 		  						</div>
 		  						<div class="mb-3">
-		  							<span class="mr-2">State:</span><a href="$instituteDet[state_url]">$instituteDet[state_name]</a>
+		  							<span class="mr-2">State:</span><a href="{$institute->getState()->getStateURL()}">{$institute->getState()->getStateName()}</a>
 		  						</div>
 		  						<h6>Course Offer: $i</h6>
 	  						</div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2019 at 12:08 PM
+-- Generation Time: Jun 18, 2019 at 06:01 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.12
 
@@ -30,6 +30,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AuthenticateUser` (IN `username` VA
 		SELECT user_name, pwd FROM users WHERE user_name = username ;
 	END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstitute` (IN `name` TEXT, IN `addresses` TEXT, IN `url` TEXT, IN `stateId` INT(6))  BEGIN
+       
+        INSERT INTO `institute`(institute_name, address,address_url,state_id)
+        VALUES(name, addresses, url, stateId);
+        
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `username` VARCHAR(30), IN `email` VARCHAR(50), IN `pass` VARCHAR(20), IN `dob` DATE)  BEGIN
  		INSERT INTO users(user_name, email, pwd, dob)
         VALUES(username, email, pass, dob);
@@ -55,12 +62,45 @@ WHERE u.user_id = @userID
 	&& r.role_name = @roleName ;
     END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectCourseByInstituteID` (IN `instituteID` BIGINT)  BEGIN
+    	SELECT ic.course_id, c.course_name, ic.fee, ic.duration
+        FROM `institute_course` ic, `course` c
+        WHERE ic.institute_id = instituteID && c.course_id = ic.course_id;
+        
+	END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectGalleryIDByNewsID` (IN `newsID` BIGINT)  BEGIN
+        	SET @imageID = (SELECT image_id FROM gallery_news WHERE news_id = newsID);
+            SELECT * FROM gallery WHERE image_id = @imageID;
+		END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectInstituteCourse` (IN `instituteID` INT(10))  BEGIN
+		SELECT c.*, ic.fee, ic.duration
+        FROM institute_course ic, course c
+        WHERE ic.institute_id = instituteID && ic.course_id = c.course_id;
+	END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectInstituteDetails` (IN `instituteID` INT(10))  BEGIN 
+	SELECT i.*, s.state_name, s.state_url
+    FROM `institute` i, `state`s
+    WHERE i.institute_id = instituteID && s.state_id = i.state_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectNewsByInstituteID` (IN `instituteID` BIGINT)  BEGIN
+    	SELECT * FROM `news` WHERE institute_id = instituteID;
+    END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUser` (IN `col_name` VARCHAR(50), IN `requirement` VARCHAR(50))  BEGIN 
     CASE col_name 
     	WHEN 'user_name' THEN SELECT user_name FROM Users WHERE user_name = requirement;
        	WHEN 'email' THEN SELECT email FROM Users WHERE email = requirement;
         END CASE;
 END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUserInstitute` (IN `userID` INT(6))  BEGIN
+        	SET @instituteID = (SELECT institute_id FROM `institute_user` WHERE user_id = userID);
+            CALL SelectInstituteDetails(@instituteID);
+        END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateUser` (IN `userID` INT(6), IN `userDOB` DATE, IN `userPwd` VARCHAR(30))  BEGIN
     	UPDATE users
@@ -194,14 +234,65 @@ INSERT INTO `course` (`course_id`, `course_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cover_photo`
+--
+
+CREATE TABLE `cover_photo` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `image_id` bigint(20) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `cover_photo`
+--
+
+INSERT INTO `cover_photo` (`institute_id`, `image_id`) VALUES
+(2, 26),
+(3, 33);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `gallery`
 --
 
 CREATE TABLE `gallery` (
   `image_id` bigint(20) UNSIGNED NOT NULL,
-  `image_path` text NOT NULL,
+  `image_path` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `gallery`
+--
+
+INSERT INTO `gallery` (`image_id`, `image_path`) VALUES
+(25, 'Images/Profile/inti.jpg'),
+(26, 'Images/cover/inti.jpg'),
+(27, 'Images/Logo/inti.png'),
+(28, 'Images/InstituteDetail/1.jpg'),
+(29, 'Images/InstituteDetail/2.jpg'),
+(30, 'Images/InstituteDetail/3.jpg'),
+(31, 'Images/Profile/31.png'),
+(32, 'Images/Logo/32.png'),
+(33, 'Images/Cover/33.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gallery_news`
+--
+
+CREATE TABLE `gallery_news` (
+  `image_id` bigint(20) UNSIGNED NOT NULL,
   `news_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `gallery_news`
+--
+
+INSERT INTO `gallery_news` (`image_id`, `news_id`) VALUES
+(28, 1);
 
 -- --------------------------------------------------------
 
@@ -211,11 +302,20 @@ CREATE TABLE `gallery` (
 
 CREATE TABLE `institute` (
   `institute_id` int(10) UNSIGNED NOT NULL,
-  `institute_name` varchar(100) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `address_url` varchar(255) NOT NULL,
+  `institute_name` text NOT NULL,
+  `address` text NOT NULL,
+  `address_url` text NOT NULL,
+  `iframe_url` text NOT NULL,
   `state_id` int(6) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `institute`
+--
+
+INSERT INTO `institute` (`institute_id`, `institute_name`, `address`, `address_url`, `iframe_url`, `state_id`) VALUES
+(2, 'INTI Collge Penang', '1-Z, Lebuh Bukit Jambul, Bukit Jambul, 11900 Bayan Lepas, Pulau Pinang', 'https://goo.gl/maps/cx43bBcQaQkNP5PL6', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy', 7),
+(3, 'SEGI College Penang', 'Wisma Greenhall, 43, Jalan Green Hall, 10200 George Town, Pulau Pinang', 'https://goo.gl/maps/q5PC11fzU4WdaTU57', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.9615395055894!2d100.3374739147654!3d5.422814696067055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac3853c19eabd%3A0xf18e216f6994764b!2sSEGi+College+Penang!5e0!3m2!1sen!2smy!4v1560873244562!5m2!1sen!2smy', 7);
 
 -- --------------------------------------------------------
 
@@ -225,8 +325,59 @@ CREATE TABLE `institute` (
 
 CREATE TABLE `institute_course` (
   `institute_id` int(10) UNSIGNED NOT NULL,
-  `course_id` int(6) UNSIGNED NOT NULL
+  `course_id` int(6) UNSIGNED NOT NULL,
+  `fee` double NOT NULL,
+  `duration` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `institute_course`
+--
+
+INSERT INTO `institute_course` (`institute_id`, `course_id`, `fee`, `duration`) VALUES
+(2, 1, 55000, 2),
+(2, 12, 55000, 4),
+(2, 22, 50000, 4),
+(2, 25, 35000, 2),
+(2, 31, 25000, 2),
+(2, 35, 15000, 3),
+(2, 53, 88000, 3),
+(2, 55, 58000, 3),
+(2, 67, 28000, 3),
+(2, 79, 16000, 2),
+(2, 80, 35000, 2),
+(2, 82, 45000, 2),
+(3, 1, 25000, 3),
+(3, 2, 25000, 3),
+(3, 12, 32000, 2),
+(3, 21, 55000, 2),
+(3, 31, 15000, 2),
+(3, 41, 23000, 2),
+(3, 51, 28000, 3),
+(3, 61, 43000, 2),
+(3, 71, 76000, 3),
+(3, 81, 25000, 2),
+(3, 91, 22000, 3),
+(3, 101, 21000, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `institute_logo`
+--
+
+CREATE TABLE `institute_logo` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `image_id` bigint(20) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `institute_logo`
+--
+
+INSERT INTO `institute_logo` (`institute_id`, `image_id`) VALUES
+(2, 27),
+(3, 32);
 
 -- --------------------------------------------------------
 
@@ -238,6 +389,14 @@ CREATE TABLE `institute_user` (
   `institute_id` int(10) UNSIGNED NOT NULL,
   `user_id` int(6) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `institute_user`
+--
+
+INSERT INTO `institute_user` (`institute_id`, `user_id`) VALUES
+(2, 12),
+(3, 13);
 
 -- --------------------------------------------------------
 
@@ -251,6 +410,32 @@ CREATE TABLE `news` (
   `news_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `institute_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `news`
+--
+
+INSERT INTO `news` (`news_id`, `content`, `news_date`, `institute_id`) VALUES
+(1, 'Let INTI ligthen your future', '2019-06-18 09:31:50', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `profile_pic`
+--
+
+CREATE TABLE `profile_pic` (
+  `institute_id` int(10) UNSIGNED NOT NULL,
+  `image_id` bigint(20) UNSIGNED DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `profile_pic`
+--
+
+INSERT INTO `profile_pic` (`institute_id`, `image_id`) VALUES
+(2, 25),
+(3, 31);
 
 -- --------------------------------------------------------
 
@@ -292,27 +477,28 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 
 CREATE TABLE `state` (
   `state_id` int(6) UNSIGNED NOT NULL,
-  `state_name` varchar(30) NOT NULL
+  `state_name` varchar(30) NOT NULL,
+  `state_url` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `state`
 --
 
-INSERT INTO `state` (`state_id`, `state_name`) VALUES
-(1, 'Johor'),
-(2, 'Kedah'),
-(3, 'Kelantan'),
-(4, 'Malacca'),
-(5, 'Negeri Sembilan'),
-(6, 'Pahang'),
-(7, 'Penang'),
-(8, 'Perak'),
-(9, 'Perlis'),
-(10, 'Sabah'),
-(11, 'Sarawak'),
-(12, 'Selangor'),
-(13, 'Terengganu');
+INSERT INTO `state` (`state_id`, `state_name`, `state_url`) VALUES
+(1, 'Johor', 'https://goo.gl/maps/VS6sW6AwcNJmRnQU8'),
+(2, 'Kedah', 'https://goo.gl/maps/HbAn65f81FeXT8YUA'),
+(3, 'Kelantan', 'https://goo.gl/maps/CL4xja36eVUgWeeB7'),
+(4, 'Malacca', 'https://goo.gl/maps/qFuRkekUBxazvPA3A'),
+(5, 'Negeri Sembilan', 'https://goo.gl/maps/UvDwpcJPhgsjLjHA8'),
+(6, 'Pahang', 'https://goo.gl/maps/rPvj695RgVQZueTL6'),
+(7, 'Penang', 'https://goo.gl/maps/8Jrbddewr5CtgeVC6'),
+(8, 'Perak', 'https://goo.gl/maps/nPk9DogrP2bhPqvu5'),
+(9, 'Perlis', 'https://goo.gl/maps/Z6sqVV1jy2tDiQu39'),
+(10, 'Sabah', 'https://goo.gl/maps/sAhAoRsRmo7PtN5D6'),
+(11, 'Sarawak', 'https://goo.gl/maps/qN6buhqcDjkJDp6Q6'),
+(12, 'Selangor', 'https://goo.gl/maps/fWce9uhN1Ps12iJw9'),
+(13, 'Terengganu', 'https://goo.gl/maps/BWFrMrMzdMHDq7pk9');
 
 -- --------------------------------------------------------
 
@@ -340,8 +526,10 @@ INSERT INTO `users` (`user_id`, `user_name`, `email`, `pwd`, `dob`, `recent_chan
 (14, 'peyxinyee', 'pxy@gmail.com', '12345abcde', '1212-12-12', '2019-06-13 15:15:36'),
 (16, 'amanda', 'amanda@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:31:42'),
 (19, 'jeffreytht', 'jeffrey@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:45:42'),
-(20, 'dannylu', 'dannylu@gmail.com', 'qw1234567890', '2000-02-18', '2019-06-17 00:11:56'),
-(21, 'chuang jing yee', 'p18010120@student.newinti.edu.my', '12345abcde', '2000-04-15', '2019-06-17 06:25:19');
+(20, 'dannylu', 'dannylu@gmail.com', '12345abcde', '2000-02-18', '2019-06-18 02:37:56'),
+(21, 'chuang jing yee', 'p18010120@student.newinti.edu.my', '12345abcde', '2000-04-15', '2019-06-17 06:25:19'),
+(25, 'tanhoetheng', 'tan@gmail.com', '12345abcde', '2000-12-12', '2019-06-18 09:57:57'),
+(26, 'leowjiehan', 'leowjiehan@gmail.com', '12345abcde', '2000-12-12', '2019-06-18 10:02:06');
 
 -- --------------------------------------------------------
 
@@ -366,7 +554,9 @@ INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 (16, 3),
 (19, 3),
 (20, 3),
-(21, 3);
+(21, 3),
+(25, 3),
+(26, 3);
 
 --
 -- Indexes for dumped tables
@@ -379,10 +569,23 @@ ALTER TABLE `course`
   ADD PRIMARY KEY (`course_id`);
 
 --
+-- Indexes for table `cover_photo`
+--
+ALTER TABLE `cover_photo`
+  ADD PRIMARY KEY (`institute_id`),
+  ADD KEY `image_id` (`image_id`);
+
+--
 -- Indexes for table `gallery`
 --
 ALTER TABLE `gallery`
-  ADD PRIMARY KEY (`image_id`),
+  ADD PRIMARY KEY (`image_id`);
+
+--
+-- Indexes for table `gallery_news`
+--
+ALTER TABLE `gallery_news`
+  ADD KEY `image_id` (`image_id`),
   ADD KEY `news_id` (`news_id`);
 
 --
@@ -400,6 +603,13 @@ ALTER TABLE `institute_course`
   ADD KEY `course_id` (`course_id`);
 
 --
+-- Indexes for table `institute_logo`
+--
+ALTER TABLE `institute_logo`
+  ADD PRIMARY KEY (`institute_id`),
+  ADD KEY `image_id` (`image_id`);
+
+--
 -- Indexes for table `institute_user`
 --
 ALTER TABLE `institute_user`
@@ -412,6 +622,13 @@ ALTER TABLE `institute_user`
 ALTER TABLE `news`
   ADD PRIMARY KEY (`news_id`),
   ADD KEY `institute_id` (`institute_id`);
+
+--
+-- Indexes for table `profile_pic`
+--
+ALTER TABLE `profile_pic`
+  ADD PRIMARY KEY (`institute_id`),
+  ADD KEY `image_id` (`image_id`);
 
 --
 -- Indexes for table `rate`
@@ -459,19 +676,19 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `gallery`
 --
 ALTER TABLE `gallery`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
-  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -489,17 +706,25 @@ ALTER TABLE `state`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `gallery`
+-- Constraints for table `cover_photo`
 --
-ALTER TABLE `gallery`
-  ADD CONSTRAINT `gallery_ibfk_1` FOREIGN KEY (`news_id`) REFERENCES `news` (`news_id`);
+ALTER TABLE `cover_photo`
+  ADD CONSTRAINT `cover_photo_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
+  ADD CONSTRAINT `cover_photo_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `gallery` (`image_id`);
+
+--
+-- Constraints for table `gallery_news`
+--
+ALTER TABLE `gallery_news`
+  ADD CONSTRAINT `gallery_news_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `gallery` (`image_id`),
+  ADD CONSTRAINT `gallery_news_ibfk_2` FOREIGN KEY (`news_id`) REFERENCES `news` (`news_id`);
 
 --
 -- Constraints for table `institute_course`
@@ -507,6 +732,13 @@ ALTER TABLE `gallery`
 ALTER TABLE `institute_course`
   ADD CONSTRAINT `institute_course_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
   ADD CONSTRAINT `institute_course_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`);
+
+--
+-- Constraints for table `institute_logo`
+--
+ALTER TABLE `institute_logo`
+  ADD CONSTRAINT `institute_logo_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
+  ADD CONSTRAINT `institute_logo_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `gallery` (`image_id`);
 
 --
 -- Constraints for table `institute_user`
@@ -520,6 +752,13 @@ ALTER TABLE `institute_user`
 --
 ALTER TABLE `news`
   ADD CONSTRAINT `news_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`);
+
+--
+-- Constraints for table `profile_pic`
+--
+ALTER TABLE `profile_pic`
+  ADD CONSTRAINT `profile_pic_ibfk_1` FOREIGN KEY (`institute_id`) REFERENCES `institute` (`institute_id`),
+  ADD CONSTRAINT `profile_pic_ibfk_2` FOREIGN KEY (`image_id`) REFERENCES `gallery` (`image_id`);
 
 --
 -- Constraints for table `rate`

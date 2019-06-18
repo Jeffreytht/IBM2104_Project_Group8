@@ -1,10 +1,82 @@
-<?php
+	<?php
 	require("models/users.php");
 	require("models/normalUser.php");
 	require("models/admin.php");
 	require("models/superadmin.php");
+	require_once("models/institute.php");
 
 	session_start();
+	define("SERVER","localhost");
+	define("USER", "root");
+	define("PASS","");
+	define("DB","college_portal");
+
+	$conn = new mysqli(SERVER,USER,PASS,DB);
+	$sql = "SELECT * FROM institute";
+	$result = $conn->query($sql);
+	$institute = array();
+
+	while($selectedInstitute = $result->fetch_assoc())
+	{
+
+		$anotherConns = new mysqli(SERVER,USER,PASS,DB);
+		$sql = "CALL SelectInstituteDetails($selectedInstitute[institute_id])";
+
+		$anotherResult = $anotherConns->query($sql);
+		$selectedResult = $anotherResult->fetch_assoc();
+		$anotherConns->close();
+
+		$tempInstitute = new Institute();
+		$tempInstitute->assignInstitute($selectedResult);
+
+		$anotherConns = new mysqli(SERVER,USER,PASS,DB);
+		$sql = "SELECT g.image_path 
+				FROM institute_logo il, gallery g 
+				WHERE il.institute_id = $selectedInstitute[institute_id] && g.image_id = il.image_id";
+
+		$anotherResult = $anotherConns->query($sql);
+		$selectedLogo = $anotherResult->fetch_assoc();
+		$anotherConns->close();
+
+		$tempInstitute->setInstituteLogo($selectedLogo['image_path']);
+		array_push($institute,$tempInstitute);
+	}
+
+	$list = "";
+	foreach($institute as $row)
+	{
+		$numOfCourse = sizeof($row->getCourse());
+
+		$list.= <<<LIST
+		<div class='bg-white mb-3 py-3 px-2 college-list'>
+			<div class='row'>
+				<div class='col-md-4 d-flex align-items-center justify-content-center'>
+					<img src='{$row->getLogo()}' class='img-fluid  college-logo'>
+				</div>
+
+				<div class='col-md-8'>
+					<h5 class='font-weight-bold'>{$row->getInstituteName()}</h5>
+					<div class='mb-2'>
+						<span class='fa fa-star checked'></span>
+						<span class='fa fa-star checked'></span>
+						<span class='fa fa-star checked'></span>
+						<span class='fa fa-star'></span>
+						<span class='fa fa-star'></span>
+					</div>
+					<div class='row'>
+						<div class='col-md-6'>
+							<h6>Location: {$row->getState()->getStateName()}</h6>
+							<h6>Course Offer: $numOfCourse</h6>
+						</div>
+						<div class='col-md-6'>
+							<a href='instituteDetail.php?id={$row->getInstituteID()}' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+LIST;
+	}
 
 	echo "<!DOCTYPE html>";
 	echo "<html lang='en'>";
@@ -62,113 +134,11 @@ echo <<<BODY
 								<h3 class='font-weight-bold'>Institute In Malaysia</h3>
 							</div>
 							<div class='scrollbar mt-3' id='style-3' style='height:65vh;'>
-								<div class='bg-white py-3 px-2 college-list'>
-									<div class='row'>
-										<div class='col-md-4 d-flex align-items-center justify-content-center'>
-											<img src='images/logo/inti.png' class='img-fluid college-logo'>
-										</div>
-										<div class='col-md-8'>
-											<h5 class='font-weight-bold'>INTI College Penang</h5>
-											<div class='mb-2'>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-											</div>
-											<div class='row'>
-												<div class='col-md-6'>
-													<h6>Location: Penang</h6>
-													<h6>Course Offer: 100</h6>
-												</div>
-												<div class='col-md-6'>
-													<a href='institute.php?college=inti' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
 
-								<div class='bg-white mt-3 py-3 px-2 college-list'>
-									<div class='row'>
-										<div class='col-md-4 d-flex align-items-center justify-content-center'>
-											<img src='images/logo/segi.png' class='img-fluid  college-logo'>
-										</div>
-										<div class='col-md-8'>
-											<h5 class='font-weight-bold'>SEGI College Penang</h5>
-											<div class='mb-2'>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star'></span>
-												<span class='fa fa-star'></span>
-											</div>
-											<div class='row'>
-												<div class='col-md-6'>
-													<h6>Location: Penang</h6>
-													<h6>Course Offer: 100</h6>
-												</div>
-												<div class='col-md-6'>
-													<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+							$list
+								
 
-								<div class='bg-white mt-3 py-3 px-2 college-list'>
-									<div class='row'>
-										<div class='col-md-4 d-flex align-items-center justify-content-center'>
-											<img src='images/logo/tarc.jpg' class='img-fluid college-logo'>
-										</div>
-										<div class='col-md-8'>
-											<h5 class='font-weight-bold'>TARC College Penang</h5>
-											<div class='mb-2'>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star'></span>
-												<span class='fa fa-star'></span>
-											</div>
-											<div class='row'>
-												<div class='col-md-6'>
-													<h6>Location: Penang</h6>
-													<h6>Course Offer: 100</h6>
-												</div>
-												<div class='col-md-6'>
-													<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class='bg-white mt-3 py-3 px-2 college-list'>
-									<div class='row'>
-										<div class='col-md-4 d-flex align-items-center justify-content-center'>
-											<img src='images/logo/kdu.png' class='img-fluid college-logo' >
-										</div>
-										<div class='col-md-8'>
-											<h5 class='font-weight-bold'>KDU College Penang</h5>
-											<div class='mb-2'>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star checked'></span>
-												<span class='fa fa-star'></span>
-											</div>
-											<div class='row'>
-												<div class='col-md-6'>
-													<h6>Location: Penang</h6>
-													<h6>Course Offer: 100</h6>
-												</div>
-												<div class='col-md-6'>
-													<a href='' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+								
 							</div>
 						</div>
 					</div>	

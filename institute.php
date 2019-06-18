@@ -20,7 +20,7 @@
 
 	function drawline($color)
 	{
-			echo "<hr class='$color my-0' style=\"height:3px\"/>";
+		echo "<hr class='$color my-0' style=\"height:3px\"/>";
 	}
 
 	function breakLine($times)
