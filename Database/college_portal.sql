@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2019 at 06:01 PM
+-- Generation Time: Jun 21, 2019 at 10:20 AM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.12
 
@@ -29,6 +29,16 @@ DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AuthenticateUser` (IN `username` VARCHAR(30))  BEGIN
 		SELECT user_name, pwd FROM users WHERE user_name = username ;
 	END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertGalleryNews` (IN `imagePath` TEXT, IN `newsID` BIGINT)  BEGIN
+        	INSERT INTO `gallery` (image_path)
+					VALUES(imagePath);
+                    
+            SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
+            
+            INSERT INTO `gallery_news`VALUES(@imageID, newsID);
+            
+        END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstitute` (IN `name` TEXT, IN `addresses` TEXT, IN `url` TEXT, IN `stateId` INT(6))  BEGIN
        
@@ -69,9 +79,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectCourseByInstituteID` (IN `ins
         
 	END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectGalleryIDByNewsID` (IN `newsID` BIGINT)  BEGIN
-        	SET @imageID = (SELECT image_id FROM gallery_news WHERE news_id = newsID);
-            SELECT * FROM gallery WHERE image_id = @imageID;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectImageIDByNewsID` (IN `newsID` BIGINT)  BEGIN
+        	SELECT image_id FROM gallery_news WHERE news_id = newsID;
+            
 		END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectInstituteCourse` (IN `instituteID` INT(10))  BEGIN
@@ -269,12 +279,12 @@ INSERT INTO `gallery` (`image_id`, `image_path`) VALUES
 (25, 'Images/Profile/inti.jpg'),
 (26, 'Images/cover/inti.jpg'),
 (27, 'Images/Logo/inti.png'),
-(28, 'Images/InstituteDetail/1.jpg'),
-(29, 'Images/InstituteDetail/2.jpg'),
-(30, 'Images/InstituteDetail/3.jpg'),
 (31, 'Images/Profile/31.png'),
 (32, 'Images/Logo/32.png'),
-(33, 'Images/Cover/33.jpg');
+(33, 'Images/Cover/33.jpg'),
+(34, 'images/InstituteDetail/34.jpg'),
+(35, 'images/InstituteDetail/35.jpg'),
+(40, 'images/InstituteDetail/36.jpg');
 
 -- --------------------------------------------------------
 
@@ -292,7 +302,9 @@ CREATE TABLE `gallery_news` (
 --
 
 INSERT INTO `gallery_news` (`image_id`, `news_id`) VALUES
-(28, 1);
+(34, 1),
+(35, 2),
+(40, 13);
 
 -- --------------------------------------------------------
 
@@ -416,7 +428,9 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`news_id`, `content`, `news_date`, `institute_id`) VALUES
-(1, 'Let INTI ligthen your future', '2019-06-18 09:31:50', 2);
+(1, 'Let INTI ligthen your future', '2019-06-18 09:31:50', 2),
+(2, 'Physical (In)Activity in IR 4.0', '2019-06-20 16:57:32', 2),
+(13, 'SEGi College Penang (SCPG) SAG Roadshow', '2019-06-21 07:55:52', 3);
 
 -- --------------------------------------------------------
 
@@ -522,7 +536,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `user_name`, `email`, `pwd`, `dob`, `recent_changes`) VALUES
 (11, 'jeffreytan', 'tanhoetheng@gmail.com', '12345abcde', '2000-04-12', '2019-06-16 06:48:13'),
 (12, 'laukuansin', 'laukuansin@gmail.com', '12345abcde', '2000-03-05', '2019-06-17 00:39:37'),
-(13, 'chuangjingyee', 'cjy@gmail.com', '12345abcde', '2000-12-12', '2019-06-13 15:07:31'),
+(13, 'chuangjingyee', 'cjy@gmail.com', '12345abcde', '2000-04-15', '2019-06-20 07:44:43'),
 (14, 'peyxinyee', 'pxy@gmail.com', '12345abcde', '1212-12-12', '2019-06-13 15:15:36'),
 (16, 'amanda', 'amanda@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:31:42'),
 (19, 'jeffreytht', 'jeffrey@gmail.com', '12345abcde', '2000-12-12', '2019-06-16 06:45:42'),
@@ -676,7 +690,7 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `gallery`
 --
 ALTER TABLE `gallery`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `institute`
@@ -688,7 +702,7 @@ ALTER TABLE `institute`
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `role`
