@@ -13,7 +13,7 @@
 		public function getTimeStamp(){return $this->timeStamp;}
 
 		public function setContent($content){$this->content = $content;}
-		public function setImagePath($image){$this->image = $image;}
+		public function setImage ($image){$this->image = $image;}
 
 		public function __construct()
 		{
@@ -28,15 +28,24 @@
 			$this->timeStamp = $news['news_date'];
 
 			$conn = new mysqli("localhost","root","","college_portal");
-			$sql = "CALL SelectGalleryIDByNewsID($this->newsID)";
+
+			$sql = "CALL SelectImageIDByNewsID($this->newsID)";
 
 			$result = $conn->query($sql);
+			$conn ->close();
 
-			while($image = $result->fetch_assoc())
+			while($imageID = $result->fetch_assoc()['image_id'])
 			{
+				$anotherConn = new mysqli("localhost","root","","college_portal");
+				$sql = "SELECT * FROM gallery WHERE image_id = $imageID";
+				$anotherResult = $anotherConn->query($sql);
+				
+				$image = $anotherResult->fetch_assoc();
 				$tempImage = new Image();
 				$tempImage->assignImage($image);
 				array_push($this->image,$tempImage);
+
+				$anotherConn ->close();
 			}
 		}
 	}

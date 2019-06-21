@@ -1,11 +1,23 @@
 <?php
 
-require("models/users.php");
-require("models/normalUser.php");
-require("models/admin.php");
-require("models/superadmin.php");
+require_once("models/users.php");
+require_once("models/normalUser.php");
+require_once("models/admin.php");
+require_once("models/superadmin.php");
+require_once("models/institute.php");
 session_start();
 startUser(4);
+
+if(!(isset($_SESSION['user'])|| isset($_SESSION['admin']) || isset($_SESSION['superAdmin'])))
+	header("Location:index.php");
+
+$user;
+if(isset($_SESSION['user']))
+	$user = $_SESSION['user'];
+else if(isset($_SESSION['admin']))
+	$user = $_SESSION['admin'];
+else
+	$user = $_SESSION['superadmin'];
 
 $pwd1 = "";
 $pwd2 = "";
@@ -16,34 +28,18 @@ if($_POST)
 	$pwd1 = $_POST['pwd1'];
 	$pwd2 = $_POST['pwd2'];
 	$pwd3 = $_POST['pwd3'];
+	global $user;
 
 	$conn = mysqli_connect("localhost","root","","college_portal");
 	
-	$user;
-	switch($_SESSION['role'])
-	{
-		case 1:
-		global $user;
-		$user = new SuperAdmin();
-		break;
-		case 2:
-		global $user;
-		$user = new Admin();
-		break;
-		case 3:
-		global $user;
-		$user = new NormalUser();
-		break;
-	}
 
-	$userID = $_SESSION['user']->getUserID();
+	$userID = $user->getUserID();
 	$is_valid = TRUE;
 
 	$user->setDob($_POST['dob']);
 	$user->validateDob($is_Valid, 0);
 
-	if(empty($_POST['pwd1']) && empty(($_POST['pwd2'])) && empty($_POST['pwd3']))
-		$user->setPwd($_SESSION['user']->getPwd());
+	if(empty($_POST['pwd1']) && empty(($_POST['pwd2'])) && empty($_POST['pwd3']));
 	
 	else
 	{
@@ -79,29 +75,45 @@ if($_POST)
 		$sql = "CALL UpdateUser(\"$userID\", \"{$user->getDob()}\",\"{$user->getPwd()}\")";
 		if($conn->query($sql)=== TRUE)
 		{
-			$_SESSION['user']->setPwd($user->getPwd());
-			$_SESSION['user']->setDob($user->getDob());
+			$tempUser = "";
+			switch($_SESSION['role'])
+			{
+				case 1:	
+					$tempUser = "superAdmin";
+					break;
+					
+				case 2:
+					$tempUser = "admin";
+					break;
+
+				case 3:
+					$tempUser = "user";
+					break;
+
+				$_SESSION[$tempUser]->setPwd($user->getPwd());
+				$_SESSION[$tempUser]->setDob($user->getDob());
+			}
 		}
 		header("Location:my_account.php");
 	}
 }
 
-
-if(isset($_SESSION['user']))
+else
 {
-
-$self = htmlspecialchars($_SERVER['PHP_SELF']);
-echo "<!DOCTYPE html>";
-	echo "<html lang='en'>";
-		echo "<head>";
-			include("header.html");
-			echo "<script src='style/uptAcc.js'></script>";
-		echo "</head>";
-		echo "<body>";
-		include("nav.php");
-		$maskPwd = "";
-		for($i = 0 ; $i < strlen($_SESSION['user']->getPWD()); $i++)
-			$maskPwd .= "&#8226;";
+	global $user;
+	$self = htmlspecialchars($_SERVER['PHP_SELF']);
+	echo "<!DOCTYPE html>";
+		echo "<html lang='en'>";
+			echo "<head>";
+				include("header.html");
+				echo "<script src='style/uptAcc.js'></script>";
+			echo "</head>";
+			echo "<body>";
+			include("nav.php");
+			
+			$maskPwd = "";
+			for($i = 0 ; $i < strlen($user->getPWD()); $i++)
+				$maskPwd .= "&#8226;";
 
 echo <<< BODY
 	<main class="main bg-light">
@@ -111,7 +123,7 @@ echo <<< BODY
 					<div class="bg-white circle-icon d-flex justify-content-center align-items-center">
 						<i class="fas fa-user-tie fa-9x"></i>
 					</div>
-					<h4 class="mt-3">{$_SESSION['user']->getUsername()}</h4>
+					<h4 class="mt-3">{$user->getUsername()}</h4>
 				</center>
 				<div class="container mb-4">	
 					<hr class="col-md-9 my-5 bg-dark" style="height:2px" />
@@ -123,7 +135,7 @@ echo <<< BODY
 									<h4>Change Date Of Birth</h4>
 									<div class='md-form'>
 										<i class='fas fa-calendar-day prefix purple-text'></i>
-										<input type='text'class='form-control pl-2' name='dob' onfocus="this.type='date'" onblur="(this.type='text')" autocomplete='off' id="dob" placeholder='Date Of Birth' value='{$_SESSION['user']->getDob()}' />
+										<input type='text'class='form-control pl-2' name='dob' onfocus="this.type='date'" onblur="(this.type='text')" autocomplete='off' id="dob" placeholder='Date Of Birth' value='{$user->getDob()}' />
 											<div class='text-danger ml-5'>$errorMessage[0]</div>
 									</div>
 								</div>
@@ -162,6 +174,4 @@ BODY;
 	echo "</html>";
 }
 
-else
-	header("Location:index.php");
 ?>

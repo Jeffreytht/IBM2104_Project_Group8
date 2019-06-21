@@ -74,7 +74,7 @@
 			$this->instituteCover = $result->fetch_assoc()['image_path'];
 			$conn->close();
 
-
+			$this->news = array();
 			$conn = new mysqli("localhost","root","","college_portal");
 			$sql = "CALL SelectNewsByInstituteID($this->instituteID)";
 			$result = $conn->query($sql);
@@ -88,6 +88,7 @@
 
 			$conn->close();
 
+			$this->course = array();
 			$conn = new mysqli("localhost","root","","college_portal");
 			$sql = "CALL SelectCourseByInstituteID($this->instituteID)";
 			$result = $conn->query($sql);

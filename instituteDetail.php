@@ -130,7 +130,7 @@ echo <<<BODY
 		  						<h5><i class="far fa-clipboard pr-2"></i>Details</h5>
 		  						<hr/>
 		  						<div class="mb-3">
-			  						<span>Address:</span><p><a href="{$institute->getInstituteAddressURL()}">{$institute->getInstituteAddress()}}</a></p>
+			  						<span>Address:</span><p><a href="{$institute->getInstituteAddressURL()}">{$institute->getInstituteAddress()}</a></p>
 			  						<iframe class="border rounded" src="{$institute->getInstituteIFrame()}" frameborder="0" style="border:0; width:100%" allowfullscreen></iframe>
 		  						</div>
 		  						<div class="mb-3">
@@ -141,10 +141,11 @@ echo <<<BODY
 	  					</div>
   		
   						<div class="col-md-7 px-0">
-		  					<div class="bg-white border rounded px-4 py-3" style="min-height:591px;">
-		  						<h5><i class="far fa-newspaper pr-2"></i>News</h5>
-		  						<hr/>
-		  						
+		  					<div style="min-height:591px;">
+			  					<div class="bg-white border rounded px-4 py-2 mb-3">
+		  							<h5><i class="far fa-newspaper pr-2"></i>News</h5>
+		  						</div>
+		  						$news
   							</div>
 						</div>
 					</div>

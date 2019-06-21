@@ -57,7 +57,7 @@
 				"12" =>"December"
 				);
 
-			$dob = explode("-", $_SESSION['user']->getDOB());
+			$dob = explode("-", $this->getDOB());
 			$dob[1] = $month[$dob[1]];
 
 			return $dob[2]." ".$dob[1]." ".$dob[0];

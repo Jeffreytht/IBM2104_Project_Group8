@@ -131,7 +131,7 @@ echo <<<BODY
 						</div>
 						<div class='col-md-8 mx-3'>
 							<div class='py-2 px-3 bg-white'>
-								<h3 class='font-weight-bold'>Institute In Malaysia</h3>
+								<h3 class='font-weight-bold'><i class="fas fa-university pr-2"></i>Institute In Malaysia</h3>
 							</div>
 							<div class='scrollbar mt-3' id='style-3' style='height:65vh;'>
 

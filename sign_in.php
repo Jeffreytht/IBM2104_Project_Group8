@@ -56,8 +56,8 @@
 			    {
 			    	case 1:
 			    		$superAdmin = new SuperAdmin();
-			    		$SuperAdmin->assignUser($userDetail);
-			    		$_SESSION['superAdmin'] = $admin;
+			    		$superAdmin->assignUser($userDetail);
+			    		$_SESSION['superAdmin'] = $superAdmin;
 			    		$_SESSION['role'] = $userDetail['role_id'];
 			    	break;
 
