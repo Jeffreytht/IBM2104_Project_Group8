@@ -17,7 +17,8 @@
 
 	$self = htmlspecialchars($_SERVER['PHP_SELF']);
 	$course= "";
-	$i = 0;
+	
+	$numOfCourse = 0;
 
 	$conn = mysqli_connect(SERVER,USER,PASS,DB);
 	$sql = "CALL SelectInstituteCourse($_GET[id])";
@@ -25,12 +26,11 @@
 
 	while($courseDet = $result -> fetch_assoc())
 	{
-
-		$i++;
+		$numOfCourse++;
 		$course .= <<<COURSE
 			<tr>
 				<td>
-					$i
+					$numOfCourse
 				</td>
 				<td>
 					<h6>$courseDet[course_name]</h6>
@@ -64,6 +64,64 @@ COURSE;
 
 	$institute->setInstituteLogo($selectedLogo['image_path']);
 	$conn->close();
+
+	$news = "";
+	$image = "";
+	$count = 0;
+	$endRow = FALSE;
+	$sizeOfNews = sizeof($institute->getNews());
+
+	for($i = 0 ; $i < $sizeOfNews ; $i++)
+	{
+		
+		$news.= 
+		<<< NEW
+			<div class="border rounded bg-white px-4 py-3 mb-3 pb-4">
+				<div class="row d-flex align-items-center mb-2" >
+					<div class="col-md-2 mr-0 pr-0">
+						<img src="{$institute->getProfile()}" class="circle-profile-image">
+					</div>
+					<div class="col-md-10 ml-0 pl-0">
+						<h6 class="font-weight-bold mb-0 pb-0">{$institute->getInstituteName()}</h6>
+						<span class="mt-0 pt-0" style="font-size:10px">{$institute->getNews()[$i]->getTimeStamp()}</span>
+					</div>
+				</div>
+
+				<h6>{$institute->getNews()[$i]->getContent()}</h6>
+NEW;
+
+		$sizeOfImage = sizeof($institute->getNews()[$i]->getImage());
+		for($j = 0 ; $j < $sizeOfImage ; ++$j)
+		{
+			if($count % 3 == 0)
+			{
+				$endRow = FALSE;
+				$image.= "<div class='row mt-2'>";
+			}
+
+			$image.= 
+			<<<IMAGE
+				<div class="col-md-4" id="galCol" style="overflow:hidden">
+					<img src="{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage rounded border" style="min-width:100%;" >
+				</div>
+IMAGE;
+
+			if(($count + 1) % 3 == 0)
+			{
+				$endRow = TRUE;
+				$image.="</div>";
+			}	
+
+			$count++;
+
+			$news.= "<img class='img-fluid mb-3 border' src='{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}' />";
+		}
+
+		$news.="</div>";
+	}
+
+	if(!$endRow)
+		$image.="</div>";
 
 echo "<!DOCTYPE html>";
 		echo "<html lang='en' class='h-100'>";
@@ -136,7 +194,7 @@ echo <<<BODY
 		  						<div class="mb-3">
 		  							<span class="mr-2">State:</span><a href="{$institute->getState()->getStateURL()}">{$institute->getState()->getStateName()}</a>
 		  						</div>
-		  						<h6>Course Offer: $i</h6>
+		  						<h6>Course Offer: $numOfCourse</h6>
 	  						</div>
 	  					</div>
   		
@@ -170,18 +228,7 @@ echo <<<BODY
 	  			<div class="tab-pane container fade px-4 py-3 bg-white border rounded" id="gallery">
 	  				<h5><i class="far fa-images pr-2"></i>Gallery</h5>
 	  				<hr/>
-	  				<div class="row mt-2">
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/1.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/2.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-	  					<div class="col-md-4" id="galCol" style="overflow:hidden">
-							<img src="images/instituteDetail/3.jpg" class="galImage rounded" style="min-width:100%;" >
-	  					</div>
-
-	  				</div>
+	  				$image
 	  			</div>
 			</div>		
 		</div>

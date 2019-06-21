@@ -19,6 +19,7 @@
 	$admin = $_SESSION['admin'];
 	$admin->assignAdmin();
 	$newsID = "";
+	
 	if($_POST)
 	{
 		$conn = mysqli_connect(SERVER,USER,PASS,DB);
