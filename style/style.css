@@ -171,3 +171,8 @@ header,
 {
   font-size:25px;
 }
+
+.pointer
+{
+  cursor:pointer;
+}

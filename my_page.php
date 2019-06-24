@@ -20,7 +20,7 @@
 	$admin->assignAdmin();
 	$newsID = "";
 	
-	if($_POST)
+	if(isset($_POST["content"]))
 	{
 		$conn = mysqli_connect(SERVER,USER,PASS,DB);
 		$sql = "INSERT INTO news (content,institute_id) VALUES(\"$_POST[content]\",\"{$admin->getInstitute()->getInstituteID()}\")";
@@ -61,7 +61,29 @@
 		}
 	}
 
+	else if(isset($_POST["newCourse"]))
+	{
+		if(isset($_POST["courseID"]) && isset($_POST["duration"])&& isset($_POST["fee"]))
+		{
+			$conn = mysqli_connect(SERVER,USER,PASS,DB);
+			$sql = "INSERT INTO `institute_course` VALUES({$admin->getInstitute()->getINstituteID()}, $_POST[courseID], $_POST[fee], $_POST[duration])";
+			$conn->query($sql);
+			$conn->close();
+			header("location:$self");			
+		}
+	}
+
+	else if(isset($_POST["courseID"]))
+	{
+		$conn = mysqli_connect(SERVER,USER,PASS,DB);
+		$sql = "DELETE FROM `institute_course` WHERE institute_id = {$admin->getInstitute()->getINstituteID()} && course_id = $_POST[courseID]";
+		$conn->query($sql);
+		$conn->close();
+		header("location:$self");	
+	}
+
 	$course = "";
+	$courseSelection = "";
 	$news = "";
 	$image = "";
 	$count = 0;
@@ -69,7 +91,15 @@
 	$numOfCourse = sizeof($admin->getInstitute()->getCourse());
 	$sizeOfNews = sizeof($admin->getInstitute()->getNews());
 	
-	
+	$conn = new mysqli(SERVER,USER,PASS,DB);
+	$sql = "Select * FROM course";
+	$result = $conn->query($sql);
+	while($courseName = $result->fetch_assoc())
+	{
+		$courseSelection .= "<option value='$courseName[course_id]'>$courseName[course_name]</option>";
+	}
+
+
 	for($i = 0; $i < $numOfCourse; $i++)
 	{
 		// Index of course
@@ -89,6 +119,10 @@
 				</td>
 				<td>
 					{$admin->getInstitute()->getCourse()[$i]->getCourseFee()}
+				</td> 
+				<td>
+					<span class="pointer text-danger" onclick="deleteCourse(this)">Delete</span>
+					<p hidden>{$admin->getInstitute()->getCourse()[$i]->getCourseID()}</p>
 				</td>
 			</tr>
 COURSE;
@@ -146,20 +180,23 @@ IMAGE;
 	if(!$endRow)
 		$image.="</div>";
 
-
 	echo "<!DOCTYPE html>";
 		echo "<html lang='en' class='h-100'>";
 			echo "<head>";
 				include("header.html");	
-				echo "<script src='style/style.js'></script>";					
+				echo "<script src='style/style.js'></script>";	
+				echo "<script src='style/manageInstitute.js'></script>";				
 			echo "</head>";
 
 			echo "<body class='bg-light h-100'>";
 				include("nav.php");
-				
-				
+
 	echo <<<BODY
 			<main class="main">
+			<div hidden id="courseSelection">
+				<option value="" disabled selected>Select Course</option>
+				$courseSelection
+			</div>
 				<div class='container d-flex justify-content-center'>
 		<div class='collegeDetail'>	
 			<div class="view border rounded" height=100%>
@@ -181,7 +218,7 @@ IMAGE;
 						      	<a class="nav-link active" data-toggle="tab" href="#overview">Overview</a>
 						    </li>
 						    <li class="nav-item">
-						      	<a class="nav-link " data-toggle="tab" href="#course">Course</a>
+						      	<a class="nav-link" id="courseNav" data-toggle="tab" href="#course">Course</a>
 						    </li>
 						    <li class="nav-item">
 						      	<a class="nav-link" data-toggle="tab" href="#gallery" >Gallery</a>
@@ -196,18 +233,11 @@ IMAGE;
 	  				<div class="row">
 	  					<div class="col-md-5 pl-0" style="height:60vh;max-height:591px">
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
-	  							<h5><i class="far fa-thumbs-up pr-2"></i>Rate Us</h5>
+	  							<h5><i class="far fa-thumbs-up pr-2"></i>Rating and Review</h5>
 	  							<hr />
-	  							<form id="starForm" action="$self" method="get">
 		  							<div style="min-height:40px">
-			  							<i class="far fa-star star checked" id="star1"></i>
-			  							<i class="far fa-star star checked" id="star2"></i>
-			  							<i class="far fa-star star checked" id="star3"></i>
-			  							<i class="far fa-star star checked" id="star4"></i>
-			  							<i class="far fa-star star checked" id="star5"></i>
-			  							<input type="hidden" id="starValue" name="rate" value=""/>
+			  							{$admin->getInstitute()->printRate("star")}
 		  							</div>
-	  							</form>
 	  						</div>
 
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
@@ -263,19 +293,26 @@ IMAGE;
 	  			<div class="tab-pane container fade px-4 py-3 bg-white border rounded" id="course">
 	  				<h5><i class="fas fa-book pr-2"></i>Course Available</h5>
 	  				<hr/>
-	  				<table class="table table-hover">
-		  				<thead>
-		  					<tr>	
-		  						<th>#</th>
-		  						<th>Course Name</th>
-		  						<th>Duration (Years)</th>
-		  						<th>Fees (RM)</th>
-		  					</tr>
-		  				</thead>
-		  				<tbody>
-		  					$course
-		  				</tbody>
+	  				<form action="$self" id="courseAppend" method="post">
+	  					<table class="table table-hover">
+			  				<thead>
+			  					<tr>	
+			  						<th>#</th>
+			  						<th>Course Name</th>
+			  						<th>Duration (Years)</th>
+			  						<th>Fees (RM)</th>
+			  					</tr>
+			  				</thead>
+			  				<tbody id="courseDetail">
+			  					$course
+			  				</tbody>
+			  				<tbody>
+			  					<tr>
+			  						<td colspan="5" class="pointer" id="addInstitute"><i class="fas fa-plus pr-2"></i>Add institute</td>
+			  					</tr>
+			  				</tbody>
 	  				</table>	
+	  				</form>
 	  			</div>
 	  			<div class="tab-pane container fade px-4 py-3 bg-white border rounded" id="gallery">
 	  				<h5><i class="far fa-images pr-2"></i>Gallery</h5>

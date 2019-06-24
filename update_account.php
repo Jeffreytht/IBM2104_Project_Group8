@@ -17,7 +17,7 @@ if(isset($_SESSION['user']))
 else if(isset($_SESSION['admin']))
 	$user = $_SESSION['admin'];
 else
-	$user = $_SESSION['superadmin'];
+	$user = $_SESSION['superAdmin'];
 
 $pwd1 = "";
 $pwd2 = "";

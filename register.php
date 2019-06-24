@@ -1,11 +1,10 @@
 <?php
-
-	require("models/users.php");
-	require("models/normalUser.php");
-	require("models/admin.php");
-	require("models/superadmin.php");
-	require("models/institute.php");
-	require("models/news.php");
+	require_once("models/users.php");
+	require_once("models/normalUser.php");
+	require_once("models/admin.php");
+	require_once("models/superadmin.php");
+	require_once("models/institute.php");
+	require_once("models/news.php");
 	session_start();
 	startUser(5);
 

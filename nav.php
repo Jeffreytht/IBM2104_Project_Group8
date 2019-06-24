@@ -36,7 +36,7 @@ if(isset($_SESSION['user'])||isset($_SESSION['admin'])||isset($_SESSION['superAd
 
             $userManagement = "
             <li class='nav-item'>
-                <a class='nav-link' href='Maintenance.php'>User Maintenance</a>
+                <a class='nav-link' href='maintenance.php'>Maintenance</a>
             </li>
             ";
             break;
@@ -44,8 +44,7 @@ if(isset($_SESSION['user'])||isset($_SESSION['admin'])||isset($_SESSION['superAd
         case 2:
             $conn = new mysqli("localhost","root","","college_portal");
             $sql = "CALL SelectInstituteDetails(SELECT institute_id FROM institute_user WHERE user_id = {$_SESSION['admin']->getUserID()})";
-                
-
+            
             $dropdown ='
             <div class="dropdown-menu">
                 <a class="dropdown-item" href="my_account.php">My account</a>
@@ -68,8 +67,8 @@ $userPage =
     <ul class='navbar-nav nav-flex-icons'>
         <li class='nav-item'>
             <a class='nav-link'>
-                <form class='form-inline' action='/action_page.php'>
-                    <input class='form-control mr-sm-2' type='text' placeholder='Search Institute'>
+                <form class='form-inline' method='post' action='institute.php'>
+                    <input class='form-control mr-sm-2' type='text' name='searchInstitute' placeholder='Search Institute'>
                     <button type='submit' id='searchButton' class ='btn btn-success btn-rounded'>Search<i class='fas fa-search pl-2'></i></button>
                 </form>
             </a>
@@ -90,8 +89,8 @@ $userPage =
     <ul class='navbar-nav nav-flex-icons'>
         <li class='nav-item'>
             <a class='nav-link'>
-                <form class='form-inline' action='/action_page.php'>
-                    <input class='form-control mr-sm-2' type='text' placeholder='Search College'>
+                <form class='form-inline' method='post' action='institute.php'>
+                    <input class='form-control mr-sm-2' type='text' name='searchInstitute' placeholder='Search College'>
                     <button type='submit' id='searchButton' class ='btn btn-success btn-rounded'>Search<i class='fas fa-search pl-2'></i></button>
                 </form>
             </a>

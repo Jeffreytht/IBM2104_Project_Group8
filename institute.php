@@ -1,21 +1,22 @@
 <?php
 	
 	$location = $course = array();
-	$conn = mysqli_connect("localhost","root","","college_portal");
+	$conn = new mysqli("localhost","root","","college_portal");
 	$sql = "Select * FROM state";
 	$result = $conn->query($sql);
 	while($state = $result->fetch_assoc())
 	{
 		array_push($location, $state['state_name']);
 	}
-	
+	$conn->close();
+
+	$conn = new mysqli("localhost","root","","college_portal");
 	$sql = "Select * FROM course";
 	$result = $conn->query($sql);
 	while($courseName = $result->fetch_assoc())
 	{
 		array_push($course, $courseName['course_name']);
 	}
-
 	$conn->close();
 
 	function drawline($color)

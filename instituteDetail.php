@@ -1,6 +1,6 @@
 <?php
-	
-	if(!$_GET)
+
+	if(!$_GET && !$_POST)
 		header("Location:institute.php");
 
 	require("models/users.php");
@@ -15,13 +15,61 @@
 	define("PASS","");
 	define("DB","college_portal");
 
+	$userID = 0;
+	$institute_id = 0;
 	$self = htmlspecialchars($_SERVER['PHP_SELF']);
-	$course= "";
 	
+
+	if(isset($_SESSION['role']))
+	{
+		switch($_SESSION['role'])
+		{
+			case 1:
+		    		$userID = $_SESSION['superAdmin']->getUserID();
+		    	break;
+
+		    	case 2:
+		    		$userID = $_SESSION['admin']->getUserID();
+		    	break;
+
+		    	case 3:
+		    		$userID = $_SESSION['user']->getUserID();
+		    	break;
+		}
+	}
+
+	if($_POST)
+	{	
+		$institute_id = $_POST['instituteID'];
+		if(isset($_POST['rate']) && !empty($userID))
+		{
+			$conn = new mysqli(SERVER,USER,PASS,DB);
+			$sql = "INSERT INTO `rate` VALUES($userID , $_POST[instituteID], $_POST[rate])";
+			$conn->query($sql);
+			echo $conn->error;
+			$conn->close();	
+		}
+		else
+		{
+			echo <<<SCRIPT
+			<script>
+				alert("Please sign in to rate");
+				window.location.replace("sign_in.php");
+			</script>
+SCRIPT;
+		}	
+	}
+
+	else if($_GET)
+	{
+		$institute_id = $_GET['id'];
+	}
+	
+	$course= "";
 	$numOfCourse = 0;
 
 	$conn = mysqli_connect(SERVER,USER,PASS,DB);
-	$sql = "CALL SelectInstituteCourse($_GET[id])";
+	$sql = "CALL SelectInstituteCourse($institute_id)";
 	$result = $conn->query($sql);
 
 	while($courseDet = $result -> fetch_assoc())
@@ -47,7 +95,7 @@ COURSE;
 	$conn->close();
 
 	$conn = mysqli_connect("localhost","root","","college_portal");
-	$sql = "CALL SelectInstituteDetails($_GET[id])";
+	$sql = "CALL SelectInstituteDetails($institute_id)";
 	$result = $conn->query($sql);
 
 	$institute = new Institute();
@@ -56,7 +104,7 @@ COURSE;
 	$anotherConns = new mysqli(SERVER,USER,PASS,DB);
 	$sql = "SELECT g.image_path 
 			FROM institute_logo il, gallery g 
-			WHERE il.institute_id = $_GET[id] && g.image_id = il.image_id";
+			WHERE il.institute_id = $institute_id && g.image_id = il.image_id";
 
 	$anotherResult = $anotherConns->query($sql);
 	$selectedLogo = $anotherResult->fetch_assoc();
@@ -67,9 +115,41 @@ COURSE;
 
 	$news = "";
 	$image = "";
+	$rating = "";
+	$numOfRate = 0;
+	$rateDivision =<<< RATE
+		<div class="bg-white border rounded px-4 py-3 mb-3">
+			<h5><i class="far fa-thumbs-up pr-2"></i>Rate Us</h5>
+			<hr />
+			<form id="starForm" action="$self" method="post">
+				<div style="min-height:40px">
+					<i class="far fa-star star checked" id="star1"></i>
+					<i class="far fa-star star checked" id="star2"></i>
+					<i class="far fa-star star checked" id="star3"></i>
+					<i class="far fa-star star checked" id="star4"></i>
+					<i class="far fa-star star checked" id="star5"></i>
+					<input type="hidden" id="starValue" name="rate" value=""/>
+					<input type="hidden" name="instituteID" value="$institute_id"/>
+				</div>
+			</form>
+		</div>
+RATE;
+
 	$count = 0;
 	$endRow = FALSE;
 	$sizeOfNews = sizeof($institute->getNews());
+
+	if(!empty($userID))
+	{
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+		$sql = "SELECT * FROM `rate` WHERE user_id = $userID && institute_id = $institute_id";
+		$result = $conn->query($sql);
+		echo $conn->error;
+		if($result->num_rows > 0)
+			$rateDivision ="";
+		$result->close();
+		$conn->close();
+	}
 
 	for($i = 0 ; $i < $sizeOfNews ; $i++)
 	{
@@ -113,7 +193,6 @@ IMAGE;
 			}	
 
 			$count++;
-
 			$news.= "<img class='img-fluid mb-3 border' src='{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}' />";
 		}
 
@@ -122,6 +201,7 @@ IMAGE;
 
 	if(!$endRow)
 		$image.="</div>";
+
 
 echo "<!DOCTYPE html>";
 		echo "<html lang='en' class='h-100'>";
@@ -170,19 +250,14 @@ echo <<<BODY
 	  				<div class="row">
 	  					<div class="col-md-5 pl-0">
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
-	  							<h5><i class="far fa-thumbs-up pr-2"></i>Rate Us</h5>
+	  							<h5><i class="far fa-thumbs-up pr-2"></i>Rating and Review</h5>
 	  							<hr />
-	  							<form id="starForm" action="$self" method="get">
 		  							<div style="min-height:40px">
-			  							<i class="far fa-star star checked" id="star1"></i>
-			  							<i class="far fa-star star checked" id="star2"></i>
-			  							<i class="far fa-star star checked" id="star3"></i>
-			  							<i class="far fa-star star checked" id="star4"></i>
-			  							<i class="far fa-star star checked" id="star5"></i>
-			  							<input type="hidden" id="starValue" name="rate" value=""/>
+			  							{$institute->printRate("star")}
 		  							</div>
-	  							</form>
 	  						</div>
+
+	  						$rateDivision
 
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">
 		  						<h5><i class="far fa-clipboard pr-2"></i>Details</h5>
@@ -235,7 +310,6 @@ echo <<<BODY
 	</div>
 	</main>
 BODY;
-
 		include("footer.php");
 	echo "</body>";
 	echo "</html>";

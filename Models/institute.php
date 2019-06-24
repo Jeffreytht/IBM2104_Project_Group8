@@ -2,6 +2,8 @@
 	require_once("models/state.php");
 	require_once("models/news.php");
 	require_once("models/course.php");
+	require_once("models/rate.php");
+
 	class Institute
 	{
 		private $instituteID;
@@ -15,6 +17,7 @@
 		private $course;
 		private $state;
 		private $news;
+		private $rate;
 
 		public function getInstituteID(){return $this->instituteID;}
 		public function getInstituteName() {return $this->instituteName;}
@@ -27,6 +30,7 @@
 		public function getNews(){return $this->news;}
 		public function getLogo(){return $this->instituteLogo;}
 		public function getInstituteIFrame(){return $this->instituteIFrame;}
+		public function getRate(){return $this->rate;}
 
 		public function setInstituteName($instituteName){ $this->instituteName = $instituteName;}
 		public function setInstituteAddress($instituteAddress){$this->instituteAddress = $instituteAddress;}
@@ -38,6 +42,7 @@
 		public function setCourse($course){$this->course = $course;}
 		public function setInstituteLogo($instituteLogo){$this->instituteLogo = $instituteLogo;}
 		public function setInstituteIFrame($instituteIFrame){$this->instituteIFrame = $instituteIFrame;}
+		public function setRate($rate){$this->rate = $rate;}
 
 		public function __construct()
 		{
@@ -51,6 +56,7 @@
 			$this->state = new State();
 			$this->course = array();
 			$this->news = array();
+			$this->rate = 0;
 		}
 
 		public function assignInstitute($institute)
@@ -73,18 +79,20 @@
 			$result = $conn->query($sql);
 			$this->instituteCover = $result->fetch_assoc()['image_path'];
 			$conn->close();
+			$result->close();
 
 			$this->news = array();
 			$conn = new mysqli("localhost","root","","college_portal");
 			$sql = "CALL SelectNewsByInstituteID($this->instituteID)";
 			$result = $conn->query($sql);
-
+			echo $conn->error;
 			while($selectedNew = $result->fetch_assoc())
 			{
 				$tempNew = new News();
 				$tempNew->assignNews($selectedNew);
 				array_push($this->news, $tempNew);
 			}
+			$result->close();
 
 			$conn->close();
 
@@ -99,6 +107,27 @@
 				$course->assignCourse($selectedCourse);
 				array_push($this->course,$course);
 			}
+			$result->close();
+
+			$conn = new mysqli('localhost',"root","","college_portal");
+			$sql = "SELECT AVG(rating) AS average_rating FROM `rate` WHERE institute_id = $this->instituteID";
+			$result = $conn->query($sql);
+
+			if($result->num_rows > 0)
+				$this->rate = $result->fetch_assoc()['average_rating'];
+			$conn->close();
+			$result->close();
+		}
+
+		public function printRate($class = "")
+		{
+			$output = "";
+			for($i = 0; $i < floor($this->rate) ; $i++)
+				$output .= "<i class='fas $class fa-star checked pr-1'></i>";
+			for($i = 0 ; $i < 5 - floor($this->rate); $i++)
+				$output .= "<i class='far $class fa-star checked pr-1'></i>";
+	
+			return $output;
 		}
 	}
 

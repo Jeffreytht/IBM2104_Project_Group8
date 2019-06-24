@@ -7,7 +7,7 @@ require_once("models/superadmin.php");
 require_once("models/institute.php");
 session_start();
 
-if(isset($_SESSION['user'])|| isset($_SESSION['admin']) || isset($_SESSION['superadmin']))
+if(isset($_SESSION['user'])|| isset($_SESSION['admin']) || isset($_SESSION['superAdmin']))
 {
 
 	$user;
@@ -18,7 +18,7 @@ if(isset($_SESSION['user'])|| isset($_SESSION['admin']) || isset($_SESSION['supe
 		$user = $_SESSION['admin'];
 
 	else
-		$user = $_SESSION['superadmin'];
+		$user = $_SESSION['superAdmin'];
 
 echo "<!DOCTYPE html>";
 	echo "<html lang='en'>";
