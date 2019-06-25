@@ -121,10 +121,8 @@ $(document).ready(function(){
 	$(".galImage").height(imageWidth);
 
 	$("#inputGroupFile").change(function(){
-		
 		for(var i = 0 ; i < $("#inputGroupFile")[0].files.length; i++)
 			imageArray += "<li>" + $("#inputGroupFile")[0].files[i].name + "</li>";
-
 		$("#imageFiles").html(imageArray);
 	});
 });

@@ -1,21 +1,25 @@
-	<?php
-	require("models/users.php");
-	require("models/normalUser.php");
-	require("models/admin.php");
-	require("models/superadmin.php");
+<?php
+
+	#Import all the model class required
+	require_once("models/users.php");
+	require_once("models/normalUser.php");
+	require_once("models/admin.php");
+	require_once("models/superadmin.php");
 	require_once("models/institute.php");
+	require_once("models/news.php");
 
-	session_start();
-	define("SERVER","localhost");
-	define("USER", "root");
-	define("PASS","");
-	define("DB","college_portal");
+	#Store the url of the page
+	$self = htmlspecialchars($_SERVER['PHP_SELF']);
 
+	#Array to store all the institute information
 	$institute = array();
-	$result;
-	$list = "";
-	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
 
+	#Search result by database
+	$result;
+
+	$list = "";
+
+	#Store the value of the search
 	$valueOfInstitute ="";
 	$valueOfCourse = "Select Course";
 	$valueOfLocation = "Select Location";
@@ -23,88 +27,176 @@
 	if(isset($_POST["searchInstitute"]))
 	{
 		$valueOfInstitute = $_POST["searchInstitute"];
+
+		#Create a connection to database to get the institute detail based on the searching criteria
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
 		$sql = "SELECT * FROM institute WHERE institute_name LIKE \"%$_POST[searchInstitute]%\"";
-		$result = $conn->query($sql);
+
+		#Check whether the query is valid
+		#Select institute details based on institute name
+		if(!($result = $conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
+		$conn->close();
 	}
+
 	else if(isset($_POST["course"]) && isset($_POST["location"]))
 	{
 		$valueOfCourse = $_POST["course"];
 		$valueOfLocation = $_POST["location"];
+
+		#Create a connection to database to get the institute detail based on the searching criteria
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
 		$sql = "SELECT i.*, s.state_name 
-			FROM `institute` i, `state` s
-			WHERE i.institute_id IN 
-			(
-				SELECT ic.institute_id 
-				FROM `institute_course` ic, `course` c
-				WHERE c.course_name = \"$_POST[course]\" 
-				&& ic.course_id = c.course_id
-			)
-			&& i.state_id = s.state_id 
-			&& s.state_name = \"$_POST[location]\"
-			";
-		$result = $conn->query($sql);
-		echo $conn->error;
+				FROM `institute` i, `state` s
+				WHERE i.institute_id IN 
+				(
+					SELECT ic.institute_id 
+					FROM `institute_course` ic, `course` c
+					WHERE c.course_name = \"$_POST[course]\" 
+					&& ic.course_id = c.course_id
+				)
+				&& i.state_id = s.state_id 
+				&& s.state_name = \"$_POST[location]\"
+				";
+
+		#Check whether the query is valid
+		#Select institute details base on location and course		
+		if(!($result = $conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
+		$conn->close();
 	}
+
 	else if(isset($_POST["course"]))
 	{
 		$valueOfCourse = $_POST["course"];
+
+		#Create a connection to database to get the institute detail based on the searching criteria
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
 		$sql = "SELECT * 
-		FROM `institute` 
-		WHERE institute_id IN 
-		(
-			SELECT institute_id 
-			FROM `institute_course` ic, `course` c 
-			WHERE c.course_name = \"$_POST[course]\" && ic.course_id = c.course_id
-		)";
-		$result = $conn->query($sql);
-		echo $conn->error;
+				FROM `institute` 
+				WHERE institute_id IN 
+				(
+					SELECT institute_id 
+					FROM `institute_course` ic, `course` c 
+					WHERE c.course_name = \"$_POST[course]\" && ic.course_id = c.course_id
+				)";
+
+		#Check whether the query is valid.
+		#Select institute details based on the course
+		if(!($result = $conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
+		$conn->close();
 	}
+
 	else if(isset($_POST["location"]))
 	{
 		$valueOfLocation = $_POST["location"];
+
+		#Create a connection to database to get the institute detail based on the searching criteria
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
 		$sql = "SELECT i.*, s.state_name 
 				FROM `institute` i, `state` s 
 				WHERE i.state_id = s.state_id && s.state_name = \"$_POST[location]\"";
-		$result = $conn->query($sql);
 		
+		#Check whether the query is valid.
+		#Select institute details based on the location
+		if(!($result = $conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
+		$conn->close();
 	}
+
 	else
 	{
+		#Create a connection to database to get the institute detail based on the searching criteria
 		$conn = new mysqli(SERVER,USER,PASS,DB);
-		$sql = "SELECT * FROM institute";
-		$result = $conn->query($sql);
-	}
-	$conn->close();
 
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$sql = "SELECT * FROM institute";
+
+		#Check whether the query is valid
+		#Select all institute details
+		if(!($result = $conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
+		$conn->close();
+	}
+
+
+
+/******************************* GENERATE VIEW *******************************/
 	if($result->num_rows > 0)
 	{
-		while($selectedInstitute = $result->fetch_assoc())
+		#Loop and get the institute detail one by one
+		while($output = $result->fetch_assoc())
 		{
-			$anotherConns = new mysqli(SERVER,USER,PASS,DB);
-			$sql = "CALL SelectInstituteDetails($selectedInstitute[institute_id])";
+			#Create a connection to database to get the institute detail based on the search result
+			$conns = new mysqli(SERVER,USER,PASS,DB);
 
-			$anotherResult = $anotherConns->query($sql);
-			$selectedResult = $anotherResult->fetch_assoc();
-			$anotherConns->close();
+			#SQL command that call the stored procedure in the database
+			$sql = "CALL SelectInstituteDetails($output[institute_id])";
 
-			$tempInstitute = new Institute();
-			$tempInstitute->assignInstitute($selectedResult);
 
-			$anotherConns = new mysqli(SERVER,USER,PASS,DB);
-			$sql = "SELECT g.image_path 
-					FROM institute_logo il, gallery g 
-					WHERE il.institute_id = $selectedInstitute[institute_id] && g.image_id = il.image_id";
+			if($result1 = $conns->query($sql))
+			{
+				$output1 = $result1->fetch_assoc();
+				$conns->close();
 
-			$anotherResult = $anotherConns->query($sql);
-			$selectedLogo = $anotherResult->fetch_assoc();
-			$anotherConns->close();
+				$tempInstitute = new Institute();
+				$tempInstitute->assignInstitute($output1);
 
-			$tempInstitute->setInstituteLogo($selectedLogo['image_path']);
-			array_push($institute,$tempInstitute);
+				#Create a connection to database to get the image path
+				$conn = new mysqli(SERVER,USER,PASS,DB);
+
+				#Close the page if unable to create connection
+				if($conn->connect_error)
+					die ("Connection Failed".$conn->connect_error);
+
+				$sql = "SELECT g.image_path 
+						FROM institute_logo il, gallery g 
+						WHERE il.institute_id = $output1[institute_id] && g.image_id = il.image_id";
+
+				#Check whether the query is valid
+				#Return image path
+				if($result2 = $conn->query($sql))
+				{
+					$output2 = $result2->fetch_assoc();
+					$conn->close();
+
+					$tempInstitute->setInstituteLogo($output2['image_path']);
+					array_push($institute,$tempInstitute);
+				}
+				else
+					echo "Error. SQL execute failed.".$conn->error;
+			}
+			else
+				echo "Error. SQL execute failed.".$conn->error;	
 		}
 
 		foreach($institute as $row)
@@ -139,15 +231,9 @@ LIST;
 		}
 	}
 
-	echo "<!DOCTYPE html>";
-	echo "<html lang='en'>";
-		echo "<head>";
-		include("header.html");
-		echo "</head>";
-		echo "<body class='bg-light'>";
-			include("nav.php");
 
-echo <<<BODY
+
+$body = <<<BODY
 			<main class='mt-5 pt-5 main' id='wrap'>
 				<div class='container'>	
 					<div class='row mt-5'>
@@ -171,8 +257,8 @@ echo <<<BODY
 										<option value="" disabled selected>$valueOfLocation</option>
 BODY;
 										foreach($location as $state)	
-											echo "<option value='$state'>$state</option>";
-echo <<< BODY
+											$body.="<option value='$state'>$state</option>";
+$body.= <<< BODY
 									</select>
 								</div>
 								<div class='form-group'>
@@ -181,8 +267,8 @@ echo <<< BODY
 										<option value="" disabled selected>$valueOfCourse</option>
 BODY;
 										foreach($course as $name)	
-											echo "<option value='$name'>$name</option>";
-echo <<<BODY
+											$body.="<option value='$name'>$name</option>";
+$body.= <<<BODY
 									</select>
 								</div>
 								<button type='submit' class='btn btn-secondary btn-rounded mt-2 mx-0 col-md-12'>Search<i class='fas fa-search pl-3'></i></button>
@@ -202,6 +288,15 @@ echo <<<BODY
 			</main>
 BODY;
 
+/***************************** VIEW **********************************/
+	echo "<!DOCTYPE html>";
+	echo "<html lang='en'>";
+		echo "<head>";
+		include("header.html");
+		echo "</head>";
+		echo "<body class='bg-light'>";
+			include("nav.php");
+			echo $body;
 			include("footer.php");
 		echo "</body>";
 	echo "</html>";

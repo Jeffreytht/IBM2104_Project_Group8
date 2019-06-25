@@ -1,108 +1,231 @@
 <?php
+
+	#Import all the model class required
 	require_once("models/users.php");
 	require_once("models/normalUser.php");
 	require_once("models/admin.php");
 	require_once("models/superadmin.php");
 	require_once("models/institute.php");
-
+	require_once("models/news.php");
 	session_start();
 
 	if(!(isset($_SESSION['admin'])))
 		header("Location: index.php");
 
+	#Define constant variable to store attribute of mysql server
 	define("SERVER","localhost");
 	define("USER", "root");
 	define("PASS","");
 	define("DB","college_portal");
 
-	$self = htmlspecialchars($_SERVER['PHP_SELF']);
+	#Store the url of the page
+	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
+
+	#Store the admin object from the session and assign its value
 	$admin = $_SESSION['admin'];
 	$admin->assignAdmin();
+
+
 	$newsID = "";
-	
-	if(isset($_POST["content"]))
+
+	#If post request and news is submitted
+	if(!empty($_POST["content"]))
 	{
-		$conn = mysqli_connect(SERVER,USER,PASS,DB);
-		$sql = "INSERT INTO news (content,institute_id) VALUES(\"$_POST[content]\",\"{$admin->getInstitute()->getInstituteID()}\")";
-		$conn->query($sql);
+		#Create a conenction to database to insert the news submitted
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$sql = "INSERT INTO news (content,institute_id) 
+				VALUES(\"$_POST[content]\",\"{$admin->getInstitute()->getInstituteID()}\")";
+
+		if(!($conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error; 
+
 		$conn->close();
 
-		$conn = mysqli_connect(SERVER,USER,PASS,DB);
-		$sql = "SELECT MAX(news_id) as news_ID FROM news";
-		$result = $conn->query($sql);
-		$newsID = $result->fetch_assoc()['news_ID'];
-		$conn->close();
+		#Create a connection to database to select the news ID
+		$conn = new mysqli(SERVER,USER,PASS,DB);
 
-		if (isset($_FILES["newsImage"])) 
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$sql = "SELECT MAX(news_id) AS news_ID 
+				FROM news";
+
+		#Check whether the query is valid
+		#Return the current news ID
+		if($result = $conn->query($sql))
 		{
-			$maxID = 0;
-			$conn = mysqli_connect(SERVER,USER,PASS,DB);
-			$sql = "SELECT MAX(image_id) as maxID FROM gallery";
-			$result = $conn->query($sql);
-			$maxID = $result->fetch_assoc()['maxID'];
-			$conn->close();
+			#Store news id from database
+			$newsID = $result->fetch_assoc()['news_ID'];
 
-			$sizeOfFile = sizeof($_FILES['newsImage']['name']);
-
-			for($i = 0; $i < $sizeOfFile; $i++)
+			#Check whether the image is uploaded
+			if (!empty($_FILES["newsImage"]["name"][0])) 
 			{
-				$maxID++;
-				$ext = pathinfo($_FILES['newsImage']['name'][$i], PATHINFO_EXTENSION);
-				$imageDestination = "images/InstituteDetail/".$maxID.".".$ext;
+				$maxID = 0;
 
-				move_uploaded_file($_FILES['newsImage']['tmp_name'][$i], $imageDestination);
+				#Create a connection to database to get the max Image ID
+				$conn = new mysqli(SERVER,USER,PASS,DB);
 
-				$conn = mysqli_connect(SERVER,USER,PASS,DB);
-				$sql = "CALL InsertGalleryNews(\"$imageDestination\", $newsID)";
+				#Close the page if unable to create connection
+				if($conn->connect_error)
+					die ("Connection Failed".$conn->connect_error);
 
-				$conn->query($sql);
-				$conn->close();
-			}	
+				$sql = "SELECT MAX(image_id) AS maxID 
+						FROM gallery";
+
+				#Check whether the query is valid
+				#Return the max current image id
+				if($result = $conn->query($sql))
+				{
+					#Store the image id into maxID
+					$maxID = $result->fetch_assoc()['maxID'];
+					$conn->close();
+
+					#Count the number of image uploaded
+					$sizeOfFile = count($_FILES['newsImage']['name']);
+
+					#Insert all the uploaded image path into database
+					for($i = 0; $i < $sizeOfFile; $i++)
+					{
+						#Increment the max id
+						$maxID++;
+
+						#Get the image extension
+						$ext = pathinfo($_FILES['newsImage']['name'][$i], PATHINFO_EXTENSION);
+
+						#Set the image destination and rename the image
+						$imageDestination = "images/InstituteDetail/".$maxID.".".$ext;
+
+						#Upload the image to specific folder
+						move_uploaded_file($_FILES['newsImage']['tmp_name'][$i], $imageDestination);
+
+						#Conenct to database to insert the image path and id
+						$conn = new mysqli(SERVER,USER,PASS,DB);
+
+						#Close the page if unable to create connection
+						if($conn->connect_error)
+							die ("Connection Failed".$conn->connect_error);
+
+						$sql = "CALL InsertGalleryNews(\"$imageDestination\", $newsID)";
+
+						if(!($conn->query($sql)))
+							echo "Error. SQL execute failed.".$conn->error; 
+						
+						$conn->close();
+					}	
+				}	
+			}
 		}
+		else
+		{
+			echo "Error. SQL execute failed.".$conn->error; 
+			$conn->close();
+		}
+		
+		header("location:$self");	
 	}
 
+	#if post request and new course is added
 	else if(isset($_POST["newCourse"]))
 	{
+		#Check whether the input is valid
 		if(isset($_POST["courseID"]) && isset($_POST["duration"])&& isset($_POST["fee"]))
 		{
-			$conn = mysqli_connect(SERVER,USER,PASS,DB);
-			$sql = "INSERT INTO `institute_course` VALUES({$admin->getInstitute()->getINstituteID()}, $_POST[courseID], $_POST[fee], $_POST[duration])";
-			$conn->query($sql);
+			#Create a connection to database to insert the new course
+			$conn = new mysqli(SERVER,USER,PASS,DB);
+
+			#Close the page if unable to create connection
+			if($conn->connect_error)
+				die ("Connection Failed".$conn->connect_error);
+
+			$sql = "INSERT INTO `institute_course` 
+					VALUES({$admin->getInstitute()->getINstituteID()}, $_POST[courseID], $_POST[fee], $_POST[duration])";
+
+			#Check whether the query is valid
+			if(!($conn->query($sql)))
+				echo "Error. SQL execute failed.".$conn->error; 
+
 			$conn->close();
+
+			#Redirect to this page
 			header("location:$self");			
 		}
 	}
 
 	else if(isset($_POST["courseID"]))
 	{
-		$conn = mysqli_connect(SERVER,USER,PASS,DB);
-		$sql = "DELETE FROM `institute_course` WHERE institute_id = {$admin->getInstitute()->getINstituteID()} && course_id = $_POST[courseID]";
-		$conn->query($sql);
+		#Create a connection to database to delete a course
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$sql = "DELETE FROM `institute_course` 
+				WHERE institute_id = {$admin->getInstitute()->getINstituteID()} && course_id = $_POST[courseID]";
+
+		#Check whether the query is valid
+		if(!($conn->query($sql)))
+			echo "Error. SQL execute failed.".$conn->error;
+
 		$conn->close();
+
+		#Redirect to this page
 		header("location:$self");	
 	}
 
+
+/***************************** GENERATE VIEW ******************************/
+	#Table in the course tab
 	$course = "";
-	$courseSelection = "";
+
+	#Dropdown in course selection in course table 
+	$courseAvailable = "";
+
+
 	$news = "";
+
+	#Store the html element that contain image (Gallery)
 	$image = "";
+
+	#Store the counter of number of image
 	$count = 0;
+
+	#Store whether the row is ended in gallery division 
 	$endRow = FALSE;
+
+	#Store the number of institute available course
 	$numOfCourse = sizeof($admin->getInstitute()->getCourse());
-	$sizeOfNews = sizeof($admin->getInstitute()->getNews());
+
+	#Store the number of institute news
+	$numOfNews = sizeof($admin->getInstitute()->getNews());
 	
+	#Create a connection to database to get all the course available
 	$conn = new mysqli(SERVER,USER,PASS,DB);
+
+	#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+		
 	$sql = "Select * FROM course";
-	$result = $conn->query($sql);
-	while($courseName = $result->fetch_assoc())
-	{
-		$courseSelection .= "<option value='$courseName[course_id]'>$courseName[course_name]</option>";
-	}
 
+	if($result = $conn->query($sql))
+		while($courseName = $result->fetch_assoc())
+			$courseAvailable .= "<option value='$courseName[course_id]'>$courseName[course_name]</option>";
+	else
+		echo "Error. SQL execute failed.".$conn->error;
 
+	$conn->close();
+
+	#Print all the institute available course
 	for($i = 0; $i < $numOfCourse; $i++)
 	{
-		// Index of course
+		#Index of course
 		$j = 1 + $i;
 
 		$course .=			
@@ -126,11 +249,11 @@
 				</td>
 			</tr>
 COURSE;
-}
+	}
 
-	for($i = 0 ; $i < $sizeOfNews ; $i++)
+	#Print all the institute's news
+	for($i = 0 ; $i < $numOfNews ; $i++)
 	{
-		
 		$news.= 
 		<<< NEW
 			<div class="border rounded bg-white px-4 py-3 mb-3 pb-4">
@@ -143,34 +266,41 @@ COURSE;
 						<span class="mt-0 pt-0" style="font-size:10px">{$admin->getInstitute()->getNews()[$i]->getTimeStamp()}</span>
 					</div>
 				</div>
-
 				<h6>{$admin->getInstitute()->getNews()[$i]->getContent()}</h6>
 NEW;
-
+		#Store the number of image of a new
 		$sizeOfImage = sizeof($admin->getInstitute()->getNews()[$i]->getImage());
+
+		#Print all the image for each new
 		for($j = 0 ; $j < $sizeOfImage ; ++$j)
 		{
+			#Insert a new row in gallery if the row has contain already 3 images
 			if($count % 3 == 0)
 			{
 				$endRow = FALSE;
 				$image.= "<div class='row mt-2'>";
 			}
 
+			#Store the html element that contain the image in gallery
 			$image.= 
 			<<<IMAGE
 				<div class="col-md-4" id="galCol" style="overflow:hidden">
-					<img src="{$admin->getInstitute()->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage rounded border" style="min-width:100%;" >
+					<img src="{$admin->getInstitute()->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage img-fluid rounded border" style="min-width:100%;" >
 				</div>
 IMAGE;
-
+			
+			#Check whether there are 3 images in a row
+			#If yes, add a new row
 			if(($count + 1) % 3 == 0)
 			{
 				$endRow = TRUE;
 				$image.="</div>";
 			}	
 
+			#Increment the number of image
 			$count++;
 
+			#Append the new's image to news html element
 			$news.= "<img class='img-fluid mb-3 border' src='{$admin->getInstitute()->getNews()[$i]->getImage()[$j]->getImagePath()}' />";
 		}
 
@@ -180,22 +310,11 @@ IMAGE;
 	if(!$endRow)
 		$image.="</div>";
 
-	echo "<!DOCTYPE html>";
-		echo "<html lang='en' class='h-100'>";
-			echo "<head>";
-				include("header.html");	
-				echo "<script src='style/style.js'></script>";	
-				echo "<script src='style/manageInstitute.js'></script>";				
-			echo "</head>";
-
-			echo "<body class='bg-light h-100'>";
-				include("nav.php");
-
-	echo <<<BODY
+	$body = <<<BODY
 			<main class="main">
 			<div hidden id="courseSelection">
 				<option value="" disabled selected>Select Course</option>
-				$courseSelection
+				$courseAvailable
 			</div>
 				<div class='container d-flex justify-content-center'>
 		<div class='collegeDetail'>	
@@ -324,7 +443,21 @@ IMAGE;
 	</div>
 	</main>
 BODY;
-			include("footer.php");
-		echo "</body>";
+
+/************************************* VIEW *************************************/
+
+	echo "<!DOCTYPE html>";
+		echo "<html lang='en' class='h-100'>";
+			echo "<head>";
+				include("header.html");	
+				echo "<script src='style/style.js'></script>";	
+				echo "<script src='style/manageInstitute.js'></script>";				
+			echo "</head>";
+
+			echo "<body class='bg-light h-100'>";
+				include("nav.php");
+				echo $body;
+				include("footer.php");
+			echo "</body>";
 	echo "</html>";
 ?>

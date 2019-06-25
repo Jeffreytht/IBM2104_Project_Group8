@@ -7,14 +7,15 @@
 		private $image;
 		private $timeStamp;
 
+		#Getter and setter
 		public function getNewsID() {return $this->newsID;}
 		public function getContent(){return $this->content;}
 		public function getImage(){return $this->image;}
 		public function getTimeStamp(){return $this->timeStamp;}
-
 		public function setContent($content){$this->content = $content;}
 		public function setImage ($image){$this->image = $image;}
 
+		#Constructor
 		public function __construct()
 		{
 			$this->content = "";

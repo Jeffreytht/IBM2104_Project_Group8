@@ -1,5 +1,6 @@
 <?php
 
+	#Import all the model class required
 	require_once("models/users.php");
 	require_once("models/normalUser.php");
 	require_once("models/admin.php");
@@ -7,103 +8,159 @@
 	require_once("models/institute.php");
 	session_start();
 
+	#Define constant variable to store attribute of mysql server
 	define("SERVER", "localhost");
 	define("USER","root");
 	define("PASS","");
 	define("DB","college_portal");
 
+	#Redirect user to homepage if user had sign in already
 	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
 		header("Location:index.php");
 
-	$errorMessage;
+	#Error message of sign in input
+	$errorMessage = array();
 	$errorMessage = array_fill(0,2,"");
 
-	
+	#Create a temporary normal user object to store user's information
 	$user = new NormalUser();
+
+	#Store the url of the page
 	$self = htmlspecialchars("$_SERVER[PHP_SELF]");
 	
+	#Run the code if post request
 	if($_POST)
 	{
-		$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
-		$user->setPwd(htmlspecialchars($_POST["pwd"]));
+		#Store user's input into temporary normal user object
+		if(isset($_POST["username"]) && isset($_POST["username"]))
+		{
+			$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
+			$user->setPwd(htmlspecialchars($_POST["pwd"]));
+		}
 
+		#Create a connection with mysql database
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die("Connection fail". $conn->connect_error);
 		
+		#SQL command to call the stored procedure in database
 		$sql = "CALL AuthenticateUser(\"{$user->getUsername()}\")";
-		$result = $conn->query($sql);
 
-		if($result->num_rows == 0)
+		#Check whether the query is valid
+		#Return username and password
+		if($result = $conn->query($sql))
 		{
-			global $errorMessage;
-			$errorMessage[0] = "Invalid Username.";
-		}
-		else 
-		{
-			$selectedUser = $result->fetch_assoc();
 			$conn->close();
-			global $errorMessage;
 
-			if($selectedUser['user_name'] == $user->getUsername() && $selectedUser['pwd'] == $user->getPwd())
+			#Assign proper error message if username is not found
+			if($result->num_rows == 0)
+				$errorMessage[0] = "Invalid Username.";
+			
+			else 
 			{
-				$conn = new mysqli(SERVER,USER,PASS,DB);
-			    $sql = "CALL SelectAllUserDetails(\"{$user->getUsername()}\")";
-			    $result = $conn->query($sql);
-			    $userDetail = $result->fetch_assoc();
+				#Fetch the sql result from database
+				$output = $result->fetch_assoc();
 
-			    switch($userDetail['role_id'])
-			    {
-			    	case 1:
-			    		$superAdmin = new SuperAdmin();
-			    		$superAdmin->assignUser($userDetail);
-			    		$_SESSION['superAdmin'] = $superAdmin;
-			    		$_SESSION['role'] = $userDetail['role_id'];
-			    	break;
+				#Authenticate username and password
+				if($output['user_name'] == $user->getUsername() && $output['pwd'] == $user->getPwd())
+				{
+					#Create connection with mysql database and get all the user information
+					$conn = new mysqli(SERVER,USER,PASS,DB);
 
-			    	case 2:
-			    		$admin = new Admin();
-			    		$admin->assignUser($userDetail);
-			    		$admin->assignAdmin();
-			    		$_SESSION['admin'] = $admin;
-			    		$_SESSION['role'] = $userDetail['role_id'];
-			    	break;
+					#Close the page if unable to create connection
+					if($conn->connect_error)
+						die("Connection fail". $conn->connect_error);
 
-			    	case 3:
-			    		$normalUser = new NormalUser();
-			   			$normalUser->assignUser($userDetail);
-			    		$_SESSION['user'] = $normalUser;
-			    		$_SESSION['role'] = $userDetail['role_id'];
-			    	break;
-			    }
+					#Sql command to call stored procedure in mysql database
+				    $sql = "CALL SelectAllUserDetailsByUsername(\"{$user->getUsername()}\")";
 
-				echo "<script>";
-					echo "alert('Login Successfully');";
-					echo "window.location.replace(\"index.php\");";
-				echo "</script>";
+				    #Check whether the query is valid
+				    if($result = $conn->query($sql))
+				    {
+				    	#Return user's personal information and role name
+					    $output = $result->fetch_assoc();
+					    $conn->close();
+
+					    #Assign role id to session base on the user's role
+					    switch($output['role_id'])
+					    {
+					    	case 1:
+					    		#Create a super admin object and assign all user's information
+					    		$superAdmin = new SuperAdmin();
+					    		$superAdmin->assignUser($output);
+
+					    		#Store the super admin object in session
+					    		$_SESSION['superAdmin'] = $superAdmin;
+					    		
+					    	break;
+
+					    	case 2:
+					    		#Create a admin object and assign all user's information
+					    		$admin = new Admin();
+					    		$admin->assignUser($output);
+					    		$admin->assignAdmin();
+
+					    		#Store the admin object in session
+					    		$_SESSION['admin'] = $admin;
+					    	break;
+
+					    	case 3:
+					    		#Create a normal user object and assign all user's information
+					    		$normalUser = new NormalUser();
+					   			$normalUser->assignUser($output);
+
+					   			#Store the user object in session
+					    		$_SESSION['user'] = $normalUser;
+					    	break;
+					    }
+
+					    #Store role id to session
+					    $_SESSION['role'] = $output['role_id'];
+
+					    #Log in successfully and redirect to homepage
+						echo "<script>";
+							echo "alert('Login Successfully');";
+							echo "window.location.replace(\"index.php\");";
+						echo "</script>";
+				    }
+				    else
+				    {
+				    	echo "Error. SQL execute failed.".$conn->error;   
+				    	$conn->close();
+				    }
+				}
+				else
+					$errorMessage[1] = "Invalid password";
 			}
-
-			else
-				$errorMessage[1] = "Invalid password";
 		}
+		else
+		{
+			echo "Error. SQL execute failed.".$conn->error;
+			$conn->close();
+		}	
 	}
 
-	echo "<!DOCTYPE html>";
-	echo "<html lang='en'>";
-		echo "<head>";
-		include("header.html");
-		echo "</head>";
-	echo <<< BODY
+/********************************* GENERATE--VIEW ************************************/
+$body = 
+<<<BODY
 		<body>
+	<!--START SIGN IN PAGE-->
 			<div id='intro' class='view' height=100% width='100%'>
 				<div class='mask rgba-black-strong'>
 					<div class='container d-flex align-items-center justify-content-center h-100'>
 						<div class='col-md-5'>
+
+	<!--SIGN IN FORM HEADER-->
 							<div class ='jumbotron card card-image signin-jumbotron my-0'>
 								<h2 class='display-4 text-white text-center'><strong>GODs</strong></h2>
 							</div>
+	<!--END SIGN IN FORM HEADER-->
 
 							<div class='bg-light scrollbar' id='style-1' style='height:50vh; max-height:350px'>
+
+	<!--START SIGN IN FORM-->
 								<form class='px-5 pb-3' action='$self' method='post'>
 									<div class='md-form'>
 										<i class='fas fa-user prefix purple-text'></i>
@@ -134,12 +191,22 @@
 										</p>
 									</div>
 								</form>
+	<!--END SIGN IN FORM-->
+
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+	<!--END SIGN IN PAGE-->
 		</body>
-	</html>
 BODY;
+/************************************** VIEW *****************************************/
+	echo "<!DOCTYPE html>";
+	echo "<html lang='en'>";
+		echo "<head>";
+		include("header.html");
+		echo "</head>";
+		echo $body;
+	echo "</html>";
 ?>

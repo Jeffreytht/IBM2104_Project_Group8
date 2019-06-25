@@ -2,6 +2,7 @@
 
 	class NormalUser extends User
 	{
+		#Constructor
 		public function __construct()
 		{		
 			$this->username = "";

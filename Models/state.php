@@ -12,6 +12,7 @@
 		public function setStateName($stateName){$this->stateName = $stateName;}
 		public function setStateURL($stateURL){$this->stateURL = $stateURL;}
 
+		#Constructor
 		public function __construct()
 		{
 			$this->stateID = "";

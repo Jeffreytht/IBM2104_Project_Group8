@@ -1,25 +1,39 @@
 <?php
 
-	if(!$_GET && !$_POST)
-		header("Location:institute.php");
-
-	require("models/users.php");
-	require("models/normalUser.php");
-	require("models/admin.php");
-	require("models/superadmin.php");
+	#Import all the model class required
+	require_once("models/users.php");
+	require_once("models/normalUser.php");
+	require_once("models/admin.php");
+	require_once("models/superadmin.php");
 	require_once("models/institute.php");
+	require_once("models/news.php");
 	session_start();
 
-	define("SERVER","localhost");
-	define("USER", "root");
+	#Define constant variable to store attribute of mysql server
+	define("SERVER", "localhost");
+	define("USER","root");
 	define("PASS","");
 	define("DB","college_portal");
 
+	#Store the url of the page
+	$self = htmlspecialchars($_SERVER['PHP_SELF']);
+
 	$userID = 0;
 	$institute_id = 0;
-	$self = htmlspecialchars($_SERVER['PHP_SELF']);
-	
 
+	#Store institute details
+	$institute = new Institute();
+
+	if(isset($_GET['id']))
+		$institute_id = $_GET['id'];
+
+	else if(isset($_POST['instituteID']))
+		$institute_id = $_POST['instituteID'];
+
+	else
+		header("Location:institute.php");
+	
+	#Assign user information based on role id
 	if(isset($_SESSION['role']))
 	{
 		switch($_SESSION['role'])
@@ -38,86 +52,133 @@
 		}
 	}
 
+	else
+		header("Location:institute.php");
+
+
 	if($_POST)
 	{	
-		$institute_id = $_POST['instituteID'];
 		if(isset($_POST['rate']) && !empty($userID))
 		{
+			#Create a connection to database to insert user's rating
 			$conn = new mysqli(SERVER,USER,PASS,DB);
-			$sql = "INSERT INTO `rate` VALUES($userID , $_POST[instituteID], $_POST[rate])";
-			$conn->query($sql);
-			echo $conn->error;
-			$conn->close();	
+
+			#Close the page if unable to create connection
+			if($conn->connect_error)
+				die ("Connection Failed".$conn->connect_error);
+
+			#SQL command to insert rating
+			$sql = "INSERT INTO `rate` VALUES($userID , $institute_id, $_POST[rate])";
+			if(!$conn->query($sql))
+				echo $conn->error;
+
+			$conn->close();
+			echo "<script>alert(\"$instituteID\")</script>";
+			header("Location:$self?id=$institute_id");	
 		}
+
 		else
 		{
-			echo <<<SCRIPT
+			#Redirect to sign in page and ask user to sign in before rating
+			echo '
 			<script>
 				alert("Please sign in to rate");
 				window.location.replace("sign_in.php");
-			</script>
-SCRIPT;
+			</script>';
 		}	
 	}
-
-	else if($_GET)
-	{
-		$institute_id = $_GET['id'];
-	}
 	
-	$course= "";
-	$numOfCourse = 0;
-
+	#Create a connection to database to get the institute details
 	$conn = mysqli_connect(SERVER,USER,PASS,DB);
-	$sql = "CALL SelectInstituteCourse($institute_id)";
-	$result = $conn->query($sql);
 
-	while($courseDet = $result -> fetch_assoc())
-	{
-		$numOfCourse++;
-		$course .= <<<COURSE
-			<tr>
-				<td>
-					$numOfCourse
-				</td>
-				<td>
-					<h6>$courseDet[course_name]</h6>
-				</td>
-				<td>
-					$courseDet[duration]
-				</td>
-				<td>
-					$courseDet[fee]
-				</td>
-			</tr>
-COURSE;
-}
+	#Close the page if unable to create connection
+	if($conn->connect_error)
+		die ("Connection Failed".$conn->connect_error);
+
+	#SQL command to call the stored procedure in database 
+	$sql = "CALL SelectInstituteDetails($institute_id)";
+
+	#Check whether the query is valid.
+	#Return all the institute details, state details and admin details
+	if($result = $conn->query($sql))
+		$institute->assignInstitute($result ->fetch_assoc());
+	else
+		die("Error.".$conn->error);
 	$conn->close();
 
-	$conn = mysqli_connect("localhost","root","","college_portal");
-	$sql = "CALL SelectInstituteDetails($institute_id)";
-	$result = $conn->query($sql);
+	#Create a new connection to database to get the institute logo image path
+	$conn = new mysqli(SERVER,USER,PASS,DB);
 
-	$institute = new Institute();
-	$institute->assignInstitute($result ->fetch_assoc());
+	#Close the page if unable to create connection
+	if($conn->connect_error)
+		die ("Connection Failed".$conn->connect_error);
 
-	$anotherConns = new mysqli(SERVER,USER,PASS,DB);
 	$sql = "SELECT g.image_path 
 			FROM institute_logo il, gallery g 
 			WHERE il.institute_id = $institute_id && g.image_id = il.image_id";
 
-	$anotherResult = $anotherConns->query($sql);
-	$selectedLogo = $anotherResult->fetch_assoc();
-	$anotherConns->close();
+	#Check whether the query is valid.
+	#Return institute logo image path
+	if($result = $conn->query($sql))
+	{
+		$output = $result->fetch_assoc();
+		$institute->setInstituteLogo($output['image_path']);
+	}
+	else
+		echo "Error. SQL execute failed.".$conn->error;
 
-	$institute->setInstituteLogo($selectedLogo['image_path']);
 	$conn->close();
 
-	$news = "";
-	$image = "";
-	$rating = "";
-	$numOfRate = 0;
-	$rateDivision =<<< RATE
+/******************************** GENERATE VIEW *******************************************/
+
+	#Store the html element that contain the course information
+	$course= "";
+
+	#Store the number of course
+	$numOfCourse = 0;
+
+	#Create a connection to database to get institute information
+	$conn = mysqli_connect(SERVER,USER,PASS,DB);
+
+	#Close the page if unable to create connection
+	if($conn->connect_error)
+		die ("Connection Failed".$conn->connect_error);
+
+	#SQL command that call the stored procedure in database
+	$sql = "CALL SelectInstituteCourse($institute_id)";
+
+	if($result = $conn->query($sql))
+	{
+		while($courseDet = $result -> fetch_assoc())
+		{
+			#increment the number of course
+			$numOfCourse++;
+
+			$course .= <<<COURSE
+				<tr>
+					<td>
+						$numOfCourse
+					</td>
+					<td>
+						<h6>$courseDet[course_name]</h6>
+					</td>
+					<td>
+						$courseDet[duration]
+					</td>
+					<td>
+						$courseDet[fee]
+					</td>
+				</tr>
+COURSE;
+		}
+	}
+	else
+		echo "Error. SQL execute failed.".$conn->error;
+
+	$conn->close();
+
+
+$rateDivision =<<< RATE
 		<div class="bg-white border rounded px-4 py-3 mb-3">
 			<h5><i class="far fa-thumbs-up pr-2"></i>Rate Us</h5>
 			<hr />
@@ -135,25 +196,52 @@ COURSE;
 		</div>
 RATE;
 
-	$count = 0;
-	$endRow = FALSE;
-	$sizeOfNews = sizeof($institute->getNews());
+	
+	#Store the html element that contain news
+	$news = "";
 
+	#Store the html element that contain image in the gallery
+	$image = "";
+
+	#Store the counter of the image in the gallery
+	$count = 0;
+
+	#indicate whether the row is end (NEWS IMAGE)
+	$endRow = FALSE;
+	
+
+	#Check whether the user has already rate the institute.
+	#If yes, disable rating division
 	if(!empty($userID))
 	{
+		#Create a connection to  database to get the institute rating
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+	
 		$sql = "SELECT * FROM `rate` WHERE user_id = $userID && institute_id = $institute_id";
-		$result = $conn->query($sql);
-		echo $conn->error;
-		if($result->num_rows > 0)
-			$rateDivision ="";
-		$result->close();
+
+		if($result = $conn->query($sql))
+		{
+			if($result->num_rows > 0)
+			{
+				$rateDivision ="";
+			}
+		}
+		else
+			echo "Error. SQL execute failed.".$conn->error;
+
 		$conn->close();
 	}
 
+	#Get the number of news of the institute
+	$sizeOfNews = sizeof($institute->getNews());
+
+	#Loop all the news to the page
 	for($i = 0 ; $i < $sizeOfNews ; $i++)
 	{
-		
 		$news.= 
 		<<< NEW
 			<div class="border rounded bg-white px-4 py-3 mb-3 pb-4">
@@ -169,23 +257,27 @@ RATE;
 
 				<h6>{$institute->getNews()[$i]->getContent()}</h6>
 NEW;
-
+		#Get the number of image of a page
 		$sizeOfImage = sizeof($institute->getNews()[$i]->getImage());
-		for($j = 0 ; $j < $sizeOfImage ; ++$j)
+
+		#Loop to print all the image to the news
+		for($j = 0 ; $j < $sizeOfImage ; $j++)
 		{
+			#Create a new row for every 3 lines
 			if($count % 3 == 0)
 			{
+				#indicate whether the row is end
 				$endRow = FALSE;
 				$image.= "<div class='row mt-2'>";
 			}
 
 			$image.= 
 			<<<IMAGE
-				<div class="col-md-4" id="galCol" style="overflow:hidden">
-					<img src="{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage rounded border" style="min-width:100%;" >
+				<div class="col-md-4" id="galCol" style="overflow:hidden;">
+					<img src="{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage img-fluid rounded border" style="min-width:100%" >
 				</div>
 IMAGE;
-
+			#Check whether the row is end
 			if(($count + 1) % 3 == 0)
 			{
 				$endRow = TRUE;
@@ -193,26 +285,19 @@ IMAGE;
 			}	
 
 			$count++;
+
+			#Print image of the news
 			$news.= "<img class='img-fluid mb-3 border' src='{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}' />";
 		}
 
 		$news.="</div>";
 	}
 
+	#If the gallery image row havent end, end it
 	if(!$endRow)
 		$image.="</div>";
 
-
-echo "<!DOCTYPE html>";
-		echo "<html lang='en' class='h-100'>";
-			echo "<head>";
-				include("header.html");	
-				echo "<script src='style/style.js'></script>";					
-			echo "</head>";
-			echo "<body class='bg-light h-100'>";
-			include("nav.php");
-
-echo <<<BODY
+$body = <<<BODY
 	<main class='main'>
 	<div class='container d-flex justify-content-center'>
 		<div class='collegeDetail'>	
@@ -310,7 +395,20 @@ echo <<<BODY
 	</div>
 	</main>
 BODY;
-		include("footer.php");
-	echo "</body>";
-	echo "</html>";
+
+/*************************************** VIEW **********************************************/
+
+
+echo "<!DOCTYPE html>";
+		echo "<html lang='en' class='h-100'>";
+			echo "<head>";
+				include("header.html");	
+				echo "<script src='style/style.js'></script>";					
+			echo "</head>";
+			echo "<body class='bg-light h-100'>";
+				include("nav.php");
+				echo $body;
+				include("footer.php");
+			echo "</body>";
+		echo "</html>";
 ?>

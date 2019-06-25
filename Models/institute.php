@@ -19,6 +19,7 @@
 		private $news;
 		private $rate;
 
+		#Getter and setter
 		public function getInstituteID(){return $this->instituteID;}
 		public function getInstituteName() {return $this->instituteName;}
 		public function getInstituteAddress(){return $this->instituteAddress;}
@@ -44,6 +45,7 @@
 		public function setInstituteIFrame($instituteIFrame){$this->instituteIFrame = $instituteIFrame;}
 		public function setRate($rate){$this->rate = $rate;}
 
+		#Constructor
 		public function __construct()
 		{
 			$this->instituteName = "";

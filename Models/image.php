@@ -4,12 +4,13 @@
 		private $imageID;
 		private $imagePath;
 
+		#Getter and setter
 		public function getImageID(){return $this->imageID;}
 		public function getImagePath(){return $this->imagePath;}
-
 		public function setImageID($imageID){$this->imageID = $imageID;}
 		public function setImagePath($imagePath){$this->imagePath = $imagePath;}
 
+		#Constuctor
 		public function __construct()
 		{
 			$this->imageID = "";

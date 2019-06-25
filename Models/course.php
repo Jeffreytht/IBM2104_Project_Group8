@@ -6,11 +6,13 @@
 		private $courseFee;
 		private $courseDuration;
 
+		#Getter and setter
 		public function getCourseID(){return $this->courseID;}
 		public function getCourseName(){return $this->courseName;}
 		public function getCourseFee(){return $this->courseFee;}
 		public function getCourseDuration(){return $this->courseDuration;}
 
+		#Constructor
 		public function __construct()
 		{
 			$this->courseID = "";

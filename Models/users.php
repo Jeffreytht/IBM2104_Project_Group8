@@ -1,12 +1,5 @@
 <?php
-	$errorMessage;
 	
-	function startUser($num)
-	{
-		global $errorMessage;
-		$errorMessage = array_fill(0,$num,"");
-	}
-
 	abstract class User
 	{
 		protected $userID;
