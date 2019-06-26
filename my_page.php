@@ -28,8 +28,26 @@
 
 	$newsID = "";
 
+	if(isset($_POST['newsID']))
+	{
+		#Create a conenction to database to insert the news submitted
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die ("Connection Failed".$conn->connect_error);
+
+		$sql = "CALL DeleteNewsByNewsID($_POST[newsID])";
+
+		if(!($conn->query($sql)))
+			echo "Error.SQL execute failed. ".$conn->error;
+
+		$conn->close();
+		header("Location: $self");
+	}
+
 	#If post request and news is submitted
-	if(!empty($_POST["content"]))
+	else if(!empty($_POST["content"]))
 	{
 		#Create a conenction to database to insert the news submitted
 		$conn = new mysqli(SERVER,USER,PASS,DB);
@@ -257,13 +275,19 @@ COURSE;
 		$news.= 
 		<<< NEW
 			<div class="border rounded bg-white px-4 py-3 mb-3 pb-4">
-				<div class="row d-flex align-items-center mb-2" >
-					<div class="col-md-2 mr-0 pr-0">
+				<div class="row d-flex  mb-2" >
+					<div class="col-md-2 mr-0 pr-0 align-items-center">
 						<img src="{$admin->getInstitute()->getProfile()}" class="circle-profile-image">
 					</div>
-					<div class="col-md-10 ml-0 pl-0">
+					<div class="col-md-9 ml-0 pl-0 align-items-center">
 						<h6 class="font-weight-bold mb-0 pb-0">{$admin->getInstitute()->getInstituteName()}</h6>
 						<span class="mt-0 pt-0" style="font-size:10px">{$admin->getInstitute()->getNews()[$i]->getTimeStamp()}</span>
+					</div>
+					<div class="col-md-1">
+						<form action="$self" method="post">
+							<i class="far fa-trash-alt text-danger pointer" onclick="deleteNews(this)"></i>
+							<input type="hidden" value={$admin->getInstitute()->getNews()[$i]->getNewsID()} name="newsID"/>
+						</form>
 					</div>
 				</div>
 				<h6>{$admin->getInstitute()->getNews()[$i]->getContent()}</h6>
@@ -323,9 +347,7 @@ IMAGE;
 
 				<div class='mask d-flex mr-auto'>		
 					<img src="{$admin->getInstitute()->getProfile()}" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
-
 				</div>
-
 				<div class='mask d-flex justify-content-center'>		
 					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">{$admin->getInstitute()->getInstituteName()}</h1>
 				</div>

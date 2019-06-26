@@ -162,7 +162,6 @@
 			#SQL command that call the stored procedure in the database
 			$sql = "CALL SelectInstituteDetails($output[institute_id])";
 
-
 			if($result1 = $conns->query($sql))
 			{
 				$output1 = $result1->fetch_assoc();

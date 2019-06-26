@@ -22,10 +22,25 @@ function deleteCourse(element)
 	}
 }
 
+function deleteNews(element)
+{
+	var proceed = confirm("Delete this new?");
+	if(proceed)
+	{	
+		element.parentElement.submit();
+	}
+}
+
+var imageArray = [];
+
 $(document).ready(function(){
 
 	$("#addInstitute").click(function(){
 		let index = $("#courseDetail tr").last().find("td").first().html();
+
+		if(isNaN(index))
+			index = 0;
+		
 		index++;
 
 		let tRow = "<tr>";
@@ -39,6 +54,12 @@ $(document).ready(function(){
 		tRow += "<td><span class='pointer' onclick='saveCourse()'>Save</span> |<span class='pointer' onclick='cancelCourse(this)'>Cancel</span></td>";
 		tRow += "</tr>";
 		$("#courseDetail").append(tRow);
+	});
+
+	$("#inputGroupFile").change(function(){
+		for(var i = 0 ; i < $("#inputGroupFile")[0].files.length; i++)
+			imageArray += "<li>" + $("#inputGroupFile")[0].files[i].name + "</li>";
+		$("#imageFiles").html(imageArray);
 	});
 
 

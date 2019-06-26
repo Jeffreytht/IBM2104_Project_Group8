@@ -5,7 +5,7 @@ session_start();
 
 #Check whether the user is super admin
 if(!isset($_SESSION['superAdmin']))
-	header("index.php");
+	header("Location:index.php");
 	
 	#Define constant variable to store attribute of mysql server
 	define("SERVER","localhost");
@@ -183,6 +183,11 @@ TABLE;
 	  				</thead>
 	  				<tbody >
 	  					$instituteTable
+	  				</tbody>
+	  				<tbody >
+	  					<tr>
+	  						<td colspan=6><a href="addInstitute.php">Add new institute</a></td>
+	  					</tr>
 	  				</tbody>
 				</table>	
 			</div>

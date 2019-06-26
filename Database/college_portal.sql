@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 25, 2019 at 04:14 PM
+-- Generation Time: Jun 26, 2019 at 05:26 PM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.12
 
@@ -64,11 +64,42 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteInstituteByID` (IN `Institute
         DELETE FROM `institute` WHERE institute_id = InstituteID;
     END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteNewsByNewsID` (IN `newsID` BIGINT)  BEGIN
+    	CREATE TEMPORARY TABLE image(
+            id BIGINT
+            );
+        
+        INSERT INTO image(id)
+        SELECT image_id 
+        FROM `gallery_news`
+        WHERE news_id = newsID;
+        
+        DELETE FROM `gallery_news`
+        WHERE news_id = newsID;
+        
+        DELETE FROM `gallery`
+        WHERE image_id IN( SELECT id FROM `image`);
+        
+        DELETE FROM `news` 
+        WHERE news_id = newsID;
+    
+    END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUser` (IN `userID` INT(6))  BEGIN
        		DELETE FROM `user_role` WHERE user_id = userID;
             DELETE FROM `rate` WHERE user_id = userID;
 			DELETE FROM `users` WHERE user_id = userID;
 		END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertCoverPhoto` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
+    	INSERT INTO `gallery`(image_path)
+        VALUES(imagePath);
+        
+        SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
+        
+        INSERT INTO `cover_photo`
+        VALUES(instituteID, @imageID);
+    END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertGalleryNews` (IN `imagePath` TEXT, IN `newsID` BIGINT)  BEGIN
         	INSERT INTO `gallery` (image_path)
@@ -87,6 +118,25 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstitute` (IN `name` TEXT, I
         
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstituteLogo` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
+    	INSERT INTO `gallery`(image_path)
+        VALUES(imagePath);
+        
+               SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
+        
+        INSERT INTO `institute_logo`
+        VALUES(instituteID, @imageID);
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertProfilePic` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
+    	INSERT INTO `gallery`(image_path)
+        VALUES(imagePath);
+        
+        SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
+        INSERT INTO `profile_pic`
+        VALUES(instituteID, @imageID);
+    END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `username` VARCHAR(30), IN `email` VARCHAR(50), IN `pass` VARCHAR(20), IN `dob` DATE)  BEGIN
  		INSERT INTO users(user_name, email, pwd, dob)
         VALUES(username, email, pass, dob);
@@ -95,6 +145,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `username` VARCHAR(
         FROM users u, role r 
         WHERE u.user_name = username && r.role_id = 3;
     END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectAllAdminWithoutInstitute` ()  BEGIN
+        	SELECT DISTINCT u.user_name, u.user_id
+            FROM `users` u, `user_role` ur, `institute_user` iu
+            WHERE u.user_id = ur.user_id 
+            && ur.role_id = 2
+            && NOT(ur.user_id IN (SELECT user_id FROM `institute_user`));
+        END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectAllUserDetailsByUsername` (IN `username` VARCHAR(50))  BEGIN
 	SET @userID =(
@@ -306,7 +364,9 @@ CREATE TABLE `cover_photo` (
 
 INSERT INTO `cover_photo` (`institute_id`, `image_id`) VALUES
 (3, 33),
-(2, 42);
+(2, 42),
+(20, 78),
+(21, 81);
 
 -- --------------------------------------------------------
 
@@ -335,7 +395,33 @@ INSERT INTO `gallery` (`image_id`, `image_path`) VALUES
 (45, 'images/InstituteDetail/35.jpg'),
 (51, 'images/InstituteDetail/46.jpg'),
 (53, 'images/InstituteDetail/52.jpg'),
-(54, 'images/InstituteDetail/54.jpg');
+(54, 'images/InstituteDetail/54.jpg'),
+(56, 'images/InstituteDetail/56.jpg'),
+(58, 'images/profile/57.jpg'),
+(59, 'images/cover/58.jpg'),
+(60, 'images/logo/59.png'),
+(61, 'images/profile/61.jpg'),
+(62, 'images/cover/62.jpg'),
+(63, 'images/logo/63.png'),
+(64, 'images/profile/64.jpg'),
+(65, 'images/cover/65.jpg'),
+(66, 'images/logo/66.png'),
+(67, 'images/profile/67.jpg'),
+(68, 'images/cover/68.jpg'),
+(69, 'images/logo/69.png'),
+(70, 'images/profile/70.jpg'),
+(71, 'images/profile/71.jpg'),
+(72, 'images/profile/72.jpg'),
+(73, 'images/profile/73.jpg'),
+(74, 'images/profile/74.jpg'),
+(75, 'images/cover/75.jpg'),
+(76, 'images/logo/76.png'),
+(77, 'images/profile/77.jpg'),
+(78, 'images/cover/78.jpg'),
+(79, 'images/logo/79.png'),
+(80, 'images/profile/80.png'),
+(81, 'images/cover/81.jpg'),
+(82, 'images/logo/82.png');
 
 -- --------------------------------------------------------
 
@@ -358,7 +444,8 @@ INSERT INTO `gallery_news` (`image_id`, `news_id`) VALUES
 (45, 15),
 (51, 23),
 (53, 26),
-(54, 27);
+(54, 27),
+(56, 30);
 
 -- --------------------------------------------------------
 
@@ -381,7 +468,9 @@ CREATE TABLE `institute` (
 
 INSERT INTO `institute` (`institute_id`, `institute_name`, `address`, `address_url`, `iframe_url`, `state_id`) VALUES
 (2, 'INTI College Penang', '1-Z, Lebuh Bukit Jambul, Bukit Jambul, 11900 Bayan Lepas, Pulau Pinang', 'https://goo.gl/maps/cx43bBcQaQkNP5PL6', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3972.491988724782!2d100.27968201549743!3d5.34160379612528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac048a161f277%3A0x881c46d428b3162c!2sINTI+International+College+Penang!5e0!3m2!1sen!2smy!4v1560696521934!5m2!1sen!2smy', 7),
-(3, 'SEGI College Penang', 'Wisma Greenhall, 43, Jalan Green Hall, 10200 George Town, Pulau Pinang', 'https://goo.gl/maps/q5PC11fzU4WdaTU57', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.9615395055894!2d100.3374739147654!3d5.422814696067055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac3853c19eabd%3A0xf18e216f6994764b!2sSEGi+College+Penang!5e0!3m2!1sen!2smy!4v1560873244562!5m2!1sen!2smy', 7);
+(3, 'SEGI College Penang', 'Wisma Greenhall, 43, Jalan Green Hall, 10200 George Town, Pulau Pinang', 'https://goo.gl/maps/q5PC11fzU4WdaTU57', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.9615395055894!2d100.3374739147654!3d5.422814696067055!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac3853c19eabd%3A0xf18e216f6994764b!2sSEGi+College+Penang!5e0!3m2!1sen!2smy!4v1560873244562!5m2!1sen!2smy', 7),
+(20, 'SENTRAL College Penang', '6th Floor, 3, Penang St, Georgetown, 10200 George Town, Penang', 'https://goo.gl/maps/zR7mR3uLJ1PLWzyx8', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.986818923664!2d100.33934231539969!3d5.418971996069788!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac38f755c08bf%3A0xd044098a2bd5666d!2sSENTRAL+College+Penang!5e0!3m2!1sen!2smy!4v1561551402466!5m2!1sen!2smy', 7),
+(21, 'KDU College Penang', '32, Jalan Anson, George Town, 10400 George Town, Pulau Pinang', 'https://goo.gl/maps/L3hfBZzqMCjkcSof8', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3971.982835478284!2d100.32025071539971!3d5.419577696069379!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x304ac3bcbdac7aad%3A0xa9ad76b9c61d0bd3!2sKDU+Penang+University+College!5e0!3m2!1sen!2smy!4v1561562187968!5m2!1sen!2smy', 7);
 
 -- --------------------------------------------------------
 
@@ -453,7 +542,9 @@ CREATE TABLE `institute_logo` (
 
 INSERT INTO `institute_logo` (`institute_id`, `image_id`) VALUES
 (3, 32),
-(2, 43);
+(2, 43),
+(20, 79),
+(21, 82);
 
 -- --------------------------------------------------------
 
@@ -472,7 +563,9 @@ CREATE TABLE `institute_user` (
 
 INSERT INTO `institute_user` (`institute_id`, `user_id`) VALUES
 (3, 13),
-(2, 12);
+(2, 12),
+(20, 14),
+(21, 15);
 
 -- --------------------------------------------------------
 
@@ -495,7 +588,6 @@ INSERT INTO `news` (`news_id`, `content`, `news_date`, `institute_id`) VALUES
 (13, 'SEGi College Penang (SCPG) SAG Roadshow', '2019-06-21 07:55:52', 3),
 (14, 'Let INTI ligthen your future', '2019-06-18 01:31:50', 2),
 (15, 'Physical (In)Activity in IR 4.0', '2019-06-20 08:57:32', 2),
-(19, 'INTI the best', '2019-06-24 05:17:00', 2),
 (20, 'Good Afternoon', '2019-06-24 05:44:24', 3),
 (21, 'Hi have a nice day\r\n', '2019-06-24 05:48:55', 3),
 (22, 'Hello Guys', '2019-06-24 05:49:39', 3),
@@ -504,7 +596,7 @@ INSERT INTO `news` (`news_id`, `content`, `news_date`, `institute_id`) VALUES
 (25, 'Happy holiday', '2019-06-24 06:15:35', 3),
 (26, 'Our campaign\r\n', '2019-06-24 06:22:17', 3),
 (27, 'ryguyryg', '2019-06-24 07:05:15', 3),
-(28, '', '2019-06-24 07:05:26', 3);
+(30, 'Nurturing Dreams in the Garden City', '2019-06-26 06:49:01', 2);
 
 -- --------------------------------------------------------
 
@@ -523,7 +615,9 @@ CREATE TABLE `profile_pic` (
 
 INSERT INTO `profile_pic` (`institute_id`, `image_id`) VALUES
 (3, 31),
-(2, 41);
+(2, 41),
+(20, 77),
+(21, 80);
 
 -- --------------------------------------------------------
 
@@ -548,7 +642,8 @@ INSERT INTO `rate` (`user_id`, `institute_id`, `rating`) VALUES
 (13, 2, 5),
 (14, 2, 5),
 (14, 3, 5),
-(11, 2, 4);
+(11, 2, 4),
+(11, 20, 5);
 
 -- --------------------------------------------------------
 
@@ -645,9 +740,9 @@ CREATE TABLE `user_role` (
 INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 (11, 1),
 (12, 2),
-(14, 3),
+(14, 2),
 (13, 2),
-(15, 3);
+(15, 2);
 
 --
 -- Indexes for dumped tables
@@ -767,19 +862,19 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `gallery`
 --
 ALTER TABLE `gallery`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
-  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `role`

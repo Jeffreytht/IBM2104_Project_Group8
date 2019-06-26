@@ -2,7 +2,6 @@
 	require_once("models/state.php");
 	require_once("models/news.php");
 	require_once("models/course.php");
-	require_once("models/rate.php");
 
 	class Institute
 	{
@@ -83,11 +82,14 @@
 			$conn->close();
 			$result->close();
 
+			
 			$this->news = array();
 			$conn = new mysqli("localhost","root","","college_portal");
 			$sql = "CALL SelectNewsByInstituteID($this->instituteID)";
 			$result = $conn->query($sql);
 			echo $conn->error;
+
+			
 			while($selectedNew = $result->fetch_assoc())
 			{
 				$tempNew = new News();
