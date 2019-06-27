@@ -19,9 +19,9 @@
 	#SQL command that store the stored procedure in database
 	$sql = "CALL DeleteInstituteByID($_POST[id])";
 
-	/*if(!($conn->query($sql)))
+	if(!($conn->query($sql)))
 		echo "Error. SQL execute failed.".$conn->error;   
-	*/
+	
 	$conn->close();
 
 	#Redirect to previous page

@@ -52,9 +52,6 @@
 		}
 	}
 
-	else
-		header("Location:institute.php");
-
 
 	if($_POST)
 	{	
