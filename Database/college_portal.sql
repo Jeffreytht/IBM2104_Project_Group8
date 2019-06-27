@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 26, 2019 at 05:26 PM
+-- Generation Time: Jun 27, 2019 at 05:57 AM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.2.12
 
@@ -91,16 +91,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUser` (IN `userID` INT(6))  B
 			DELETE FROM `users` WHERE user_id = userID;
 		END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertCoverPhoto` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
-    	INSERT INTO `gallery`(image_path)
-        VALUES(imagePath);
-        
-        SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
-        
-        INSERT INTO `cover_photo`
-        VALUES(instituteID, @imageID);
-    END$$
-
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertGalleryNews` (IN `imagePath` TEXT, IN `newsID` BIGINT)  BEGIN
         	INSERT INTO `gallery` (image_path)
 					VALUES(imagePath);
@@ -117,25 +107,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstitute` (IN `name` TEXT, I
         VALUES(name, addresses, url, stateId);
         
 END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertInstituteLogo` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
-    	INSERT INTO `gallery`(image_path)
-        VALUES(imagePath);
-        
-               SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
-        
-        INSERT INTO `institute_logo`
-        VALUES(instituteID, @imageID);
-    END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertProfilePic` (IN `imagePath` TEXT, IN `instituteID` INT)  BEGIN
-    	INSERT INTO `gallery`(image_path)
-        VALUES(imagePath);
-        
-        SET @imageID = (SELECT image_id FROM `gallery` WHERE image_path = imagePath);
-        INSERT INTO `profile_pic`
-        VALUES(instituteID, @imageID);
-    END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertUser` (IN `username` VARCHAR(30), IN `email` VARCHAR(50), IN `pass` VARCHAR(20), IN `dob` DATE)  BEGIN
  		INSERT INTO users(user_name, email, pwd, dob)
@@ -203,7 +174,9 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectInstituteDetails` (IN `instit
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectNewsByInstituteID` (IN `instituteID` BIGINT)  BEGIN
-    	SELECT * FROM `news` WHERE institute_id = instituteID;
+    	SELECT * FROM `news` 
+        WHERE institute_id = instituteID
+        ORDER BY news_date DESC;
     END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectUser` (IN `col_name` VARCHAR(50), IN `requirement` VARCHAR(50))  BEGIN 
@@ -421,7 +394,13 @@ INSERT INTO `gallery` (`image_id`, `image_path`) VALUES
 (79, 'images/logo/79.png'),
 (80, 'images/profile/80.png'),
 (81, 'images/cover/81.jpg'),
-(82, 'images/logo/82.png');
+(82, 'images/logo/82.png'),
+(83, 'images/profile/83.png'),
+(86, 'images/profile/86.jpg'),
+(88, 'images/profile/88.jpg'),
+(90, '12374825_705198022951197_3015985995234149587_o.png'),
+(91, '12374825_705198022951197_3015985995234149587_o.png'),
+(98, 'download.png');
 
 -- --------------------------------------------------------
 
@@ -562,8 +541,8 @@ CREATE TABLE `institute_user` (
 --
 
 INSERT INTO `institute_user` (`institute_id`, `user_id`) VALUES
-(3, 13),
 (2, 12),
+(3, 13),
 (20, 14),
 (21, 15);
 
@@ -720,7 +699,8 @@ INSERT INTO `users` (`user_id`, `user_name`, `email`, `pwd`, `dob`, `recent_chan
 (12, 'laukuansin', 'laukuansin@gmail.com', '12345abcde', '2000-03-18', '2019-06-25 14:07:41'),
 (13, 'chuangjingyee', 'cjy@gmail.com', '12345abcde', '2000-04-15', '2019-06-20 07:44:43'),
 (14, 'peyxinyee', 'pxy@gmail.com', '12345abcde', '1212-12-12', '2019-06-13 15:15:36'),
-(15, 'leowjiehan', 'leowjiehan@gmail.com', '12345abcde', '2012-12-12', '2019-06-24 13:44:47');
+(15, 'leowjiehan', 'leowjiehan@gmail.com', '12345abcde', '2012-12-12', '2019-06-24 13:44:47'),
+(17, 'luchunhung', 'luchunhung@gmail.com', '12345abcde', '2000-12-12', '2019-06-26 17:37:15');
 
 -- --------------------------------------------------------
 
@@ -742,7 +722,8 @@ INSERT INTO `user_role` (`user_id`, `role_id`) VALUES
 (12, 2),
 (14, 2),
 (13, 2),
-(15, 2);
+(15, 2),
+(17, 2);
 
 --
 -- Indexes for dumped tables
@@ -799,6 +780,7 @@ ALTER TABLE `institute_logo`
 -- Indexes for table `institute_user`
 --
 ALTER TABLE `institute_user`
+  ADD PRIMARY KEY (`institute_id`),
   ADD KEY `institute_id` (`institute_id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -862,19 +844,19 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `gallery`
 --
 ALTER TABLE `gallery`
-  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `image_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
-  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `institute_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
-  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `news_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -892,7 +874,7 @@ ALTER TABLE `state`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `user_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables
