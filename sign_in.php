@@ -180,7 +180,7 @@ $body =
 											</div>
 										</div>
 										<div>
-											<a href=''>Forgot password?</a>
+											<a href='forgetPassword.php'>Forgot password?</a>
 										</div>
 									</div>
 									<div class='text-center'>

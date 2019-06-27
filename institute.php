@@ -44,7 +44,7 @@
 	$conn->close();
 
 	#Create a connection to database to get course
-	$conn = new mysqli("localhost","root","","college_portal");
+	$conn = new mysqli(SERVER, USER, PASS, DB);
 
 	#Close the page if unable to create connection
 	if($conn->connect_error)

@@ -49,6 +49,7 @@
 	#If post request and news is submitted
 	else if(!empty($_POST["content"]))
 	{
+		$_POST["content"] = htmlspecialchars($_POST["content"]);
 		#Create a conenction to database to insert the news submitted
 		$conn = new mysqli(SERVER,USER,PASS,DB);
 

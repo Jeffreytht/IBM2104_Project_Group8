@@ -1,5 +1,4 @@
 <?php
-
 	#Import all the model class required
 	require_once("models/users.php");
 	require_once("models/normalUser.php");
@@ -7,7 +6,18 @@
 	require_once("models/superadmin.php");
 	require_once("models/institute.php");
 	require_once("models/news.php");
-	session_start();
+
+	#Import PHPMailer classes into the global namespace
+	#These must be at the top of your script, not inside a function
+	use PHPMailer\PHPMailer\PHPMailer;
+	use PHPMailer\PHPMailer\Exception;
+
+	#Load Composer's autoloader
+	require 'vendor/autoload.php';
+
+	#Instantiation and passing `true` enables exceptions
+	$mail = new PHPMailer(true);
+		session_start();
 	
 	#Redirect user to homepage if user had sign in already
 	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
@@ -21,7 +31,7 @@
 
 	#Error message of register input
 	$errorMessage = array();
-	$errorMessage = array_fill(0,5,"");
+	$errorMessage = array_fill(0,6,"");
 
 	#Create a temporary normal user object to store user's information
 	$user = new NormalUser();
@@ -29,16 +39,20 @@
 	#Store the url of the page
 	$self = htmlspecialchars($_SERVER["PHP_SELF"]);
 
+	$randomNum = "";
+	$tacCode = "";
+
 	#Validate registration input 
 	function validateData()
 	{
 		#Access global variable
 		global $errorMessage;
 		global $user;
+		global $randomNum;
 
 		#Indicate whether all the input are valid
 		$is_valid = TRUE;
-		$errorMessage = array_fill(0,5,"");
+		$errorMessage = array_fill(0,6,"");
 		
 		#Call the object method to validate input
 		$user->validateName($is_valid, 0);
@@ -49,7 +63,51 @@
 
 		#Register successfully if all the input are valid
 		if($is_valid)
-			saveResult();
+		{
+			if(!isset($_SESSION['randomNum']) && $_POST)
+			{	
+				for($i = 0 ; $i < 6 ; $i++)
+					$randomNum .= rand(0,9);
+
+				$_SESSION['randomNum'] = $randomNum;
+				try {
+				    //Server settings
+				    global $mail;
+				    $mail->SMTPDebug = 0;                                       // Enable verbose debug output
+				    $mail->isSMTP();                                            // Set mailer to use SMTP
+				    $mail->Host       = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+				    $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+				    $mail->Username   = 'godsfuture99@gmail.com';                     // SMTP username
+				    $mail->Password   = 'ixrkvxvogxmtkkts';                               // SMTP password
+				    $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
+				    $mail->Port       = 465;                                    // TCP port to connect to
+
+				    //Recipients
+				    $mail->setFrom('godsfuture99@gmail.com', 'Gods');
+				    $mail->addAddress($user->getEmail(), $user->getUsername());     // Add a recipient
+
+				    // Content
+				    $mail->isHTML(true);                                  // Set email format to HTML
+				    $mail->Subject = 'Verification';
+				    $mail->Body    = 'Your tac code is "'.$randomNum.'"';
+				    $mail->send();
+				} 
+				catch (Exception $e) 
+				{
+				    die("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+				}
+			}
+			else if($_POST['tacCode'] != $_SESSION['randomNum'])
+			{
+				$errorMessage[5] = "Incorrect Tac Code!";
+			}
+			else
+			{
+				unset($_SESSION['randomNum']);
+				saveResult();
+			}
+		}
+
 	}
 
 	#Insert valid user input into database
@@ -153,6 +211,16 @@
 	
 /********************************* GENERATE VIEW **************************************/
 
+if(isset($_SESSION['randomNum']) && $_POST)
+$tacCode = <<<TACCODE
+	<div class='md-form'>
+		<i class='fa fa-envelope prefix purple-text'></i>
+		<input mdbActive class='form-control pl-2' type='text' name='tacCode' required autocomplete='off' placeholder='TAC code' />
+		<div class="ml-5">A tac code has been sent to {$user->getEmail()}</div>
+		<div class='text-danger ml-5'>$errorMessage[5]</div>
+	</div>
+TACCODE;
+
 $body =<<<BODY
 		<body>
 			<div id='intro' class='view'>
@@ -195,6 +263,7 @@ $body =<<<BODY
 										<input type='text'class='form-control pl-2' name='dob' onfocus="(this.type='date')" onblur="(this.type='text')" required autocomplete='off' placeholder='Date Of Birth' value='{$user->getDob()}'/>
 										<div class='text-danger ml-5'>$errorMessage[4]</div>
 									</div>
+									$tacCode
 									<div class='text-center'>
 										<button type='submit' class='text-white btn blue-gradient col-md-6 my-4'>Register</button>
 									</div>
