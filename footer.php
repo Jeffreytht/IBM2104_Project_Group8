@@ -20,10 +20,10 @@ echo <<< FOOTER
                     </h6>
                     <hr class='deep-purple accent-2 mb-4 mt-0 d-inline-block mx-auto' style='width: 60px;'>
                     <p>
-                        <a href='#!'>Your Account</a>
+                        <a href='my_account.php'>Your Account</a>
                     </p>
                     <p>
-                        <a href='college.php'>Colleges</a>
+                        <a href='institute.php'>Colleges</a>
                     </p>
                     <p>
                         <a href='#!'>Help</a>

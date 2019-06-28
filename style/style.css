@@ -148,6 +148,15 @@ header,
   min-width:40px;
 }
 
+.circle-news-image
+{
+  border-radius:50%;
+  max-height:80px;
+  max-width:80px;
+  min-height:80px;
+  min-width:80px;
+}
+
 .circle-icon
 {
   border-radius:50%;
