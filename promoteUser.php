@@ -11,9 +11,12 @@
 	if(!isset($_SESSION["superAdmin"]) || !$_POST)
 		header("Location:index.php");
 
+	
+
 	#Create a connection to database to update user role
 	$conn = new mysqli(SERVER,USER,PASS,DB);
-	$sql = "UPDATE `user_role` SET role_id = 2 WHERE user_id = $_POST[id]";
+	$id = $conn->real_escape_string($_POST['id']);
+	$sql = "UPDATE `user_role` SET role_id = 2 WHERE user_id = $id";
 
 	if(!($conn->query($sql)))
 		echo "Error. SQL execute failed.".$conn->error;

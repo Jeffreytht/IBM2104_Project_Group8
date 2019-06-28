@@ -49,16 +49,16 @@
 	#If post request and news is submitted
 	else if(!empty($_POST["content"]))
 	{
-		$_POST["content"] = htmlspecialchars($_POST["content"]);
 		#Create a conenction to database to insert the news submitted
 		$conn = new mysqli(SERVER,USER,PASS,DB);
+		$content = $conn->real_escape_string($_POST["content"]);
 
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
 		$sql = "INSERT INTO news (content,institute_id) 
-				VALUES(\"$_POST[content]\",\"{$admin->getInstitute()->getInstituteID()}\")";
+				VALUES(\"$content\",\"{$admin->getInstitute()->getInstituteID()}\")";
 
 		if(!($conn->query($sql)))
 			echo "Error. SQL execute failed.".$conn->error; 
@@ -162,8 +162,12 @@
 			if($conn->connect_error)
 				die ("Connection Failed".$conn->connect_error);
 
+			$courseID = $conn->real_escape_string($_POST['courseID']);
+			$fee = $conn->real_escape_string($_POST['fee']);
+			$duration = $conn->real_escape_string($_POST['duration']);
+
 			$sql = "INSERT INTO `institute_course` 
-					VALUES({$admin->getInstitute()->getINstituteID()}, $_POST[courseID], $_POST[fee], $_POST[duration])";
+					VALUES({$admin->getInstitute()->getINstituteID()}, $courseID, $fee, $duration";
 
 			#Check whether the query is valid
 			if(!($conn->query($sql)))
@@ -181,12 +185,14 @@
 		#Create a connection to database to delete a course
 		$conn = new mysqli(SERVER,USER,PASS,DB);
 
+		$courseID = $conn->real_escape_string($_POST['courseID']);
+
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
 		$sql = "DELETE FROM `institute_course` 
-				WHERE institute_id = {$admin->getInstitute()->getINstituteID()} && course_id = $_POST[courseID]";
+				WHERE institute_id = {$admin->getInstitute()->getINstituteID()} && course_id = $courseID";
 
 		#Check whether the query is valid
 		if(!($conn->query($sql)))

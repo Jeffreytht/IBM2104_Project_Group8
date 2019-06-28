@@ -76,13 +76,19 @@
 			$sql = "SELECT * FROM `taccode` WHERE user_name = \"{$user->getUsername()}\"";
 			$result = $conn->query($sql);
 			$tacCode = $result->fetch_assoc()['code'];
+
+			if(isset($_POST['tacCode']))
+				$_POST['tacCode'] = $conn->real_escape_string($_POST['tacCode']);
+
 			$conn->close();
+
 
 			if(isset($_POST['tacCode'])&& $_POST['tacCode'] == $tacCode)
 			{
 				$conn = new mysqli(SERVER, USER, PASS, DB);
 				if($conn->connect_error)
 					die("Connection Error. ".$conn->connect_error());
+				
 				$sql = "DELETE FROM `taccode` WHERE user_name = \"{$user->getUsername()}\"";
 				$conn->query($sql);
 				$conn->close();

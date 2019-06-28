@@ -110,7 +110,11 @@
 			#Create a connection to database to update user dob and password
 			$conn = mysqli_connect(SERVER,USER,PASS,DB);
 
-			$sql = "CALL UpdateUser(\"$userID\", \"{$user->getDob()}\",\"{$user->getPwd()}\")";
+			$dob = $conn->real_escape_string($user->getDob());
+			$userID = $conn->real_escape_string($userID);
+			$pass = $conn->real_escape_string($user->getPwd());
+
+			$sql = "CALL UpdateUser(\"$userID\", \"$dob\",\"$pass\")";
 
 			#Check whether the query is valid 
 			if($conn->query($sql))
