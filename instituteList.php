@@ -228,7 +228,7 @@
 								<h6>Course Offer: $numOfCourse</h6>
 							</div>
 							<div class='col-md-6'>
-								<a href='instituteDetail.php?id={$row->getInstituteID()}' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
+								<a href='institute.php?id={$row->getInstituteID()}' class='btn btn-outline-secondary btn-rounded waves-effect'>View Detail<i class='fas fa-list pl-2'></i></a>
 							</div>
 						</div>
 					</div>
