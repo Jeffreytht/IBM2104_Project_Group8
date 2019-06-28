@@ -45,7 +45,7 @@
 		#Store user's input into temporary normal user object
 		if(isset($_POST["username"]))
 		{
-			$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
+			$user->setUsername(strtolower($_POST["username"]));
 		}
 
 		#Create a connection with mysql database
@@ -54,11 +54,13 @@
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die("Connection fail". $conn->connect_error);
+
+		$username = $conn->real_escape_string($user->getUsername());
 		
 		#SQL command to call the stored procedure in database
 		$sql = "SELECT *
 				FROM users
-				WHERE user_name = \"{$user->getUsername()}\"";
+				WHERE user_name = \"$username\"";
 
 		if($result = $conn->query($sql))
 		{

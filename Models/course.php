@@ -7,10 +7,10 @@
 		private $courseDuration;
 
 		#Getter and setter
-		public function getCourseID(){return $this->courseID;}
-		public function getCourseName(){return $this->courseName;}
-		public function getCourseFee(){return $this->courseFee;}
-		public function getCourseDuration(){return $this->courseDuration;}
+		public function getCourseID(){return htmlspecialchars($this->courseID);}
+		public function getCourseName(){return htmlspecialchars($this->courseName);}
+		public function getCourseFee(){return htmlspecialchars($this->courseFee);}
+		public function getCourseDuration(){return htmlspecialchars($this->courseDuration);}
 
 		#Constructor
 		public function __construct()

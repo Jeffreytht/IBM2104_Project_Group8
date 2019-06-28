@@ -19,17 +19,17 @@
 		private $rate;
 
 		#Getter and setter
-		public function getInstituteID(){return $this->instituteID;}
-		public function getInstituteName() {return $this->instituteName;}
-		public function getInstituteAddress(){return $this->instituteAddress;}
-		public function getInstituteAddressUrl(){return $this->instituteAddressUrl;}
-		public function getProfile(){return $this->instituteProfile;}
-		public function getCover(){return $this->instituteCover;}
+		public function getInstituteID(){return htmlspecialchars($this->instituteID);}
+		public function getInstituteName() {return htmlspecialchars($this->instituteName);}
+		public function getInstituteAddress(){return htmlspecialchars($this->instituteAddress);}
+		public function getInstituteAddressUrl(){return htmlspecialchars($this->instituteAddressUrl);}
+		public function getProfile(){return htmlspecialchars($this->instituteProfile);}
+		public function getCover(){return htmlspecialchars($this->instituteCover);}
 		public function getCourse(){return $this->course;}
+		public function getLogo(){return htmlspecialchars($this->instituteLogo);}
+		public function getInstituteIFrame(){return htmlspecialchars($this->instituteIFrame);}
 		public function getState(){return $this->state;}
 		public function getNews(){return $this->news;}
-		public function getLogo(){return $this->instituteLogo;}
-		public function getInstituteIFrame(){return $this->instituteIFrame;}
 		public function getRate(){return $this->rate;}
 
 		public function setInstituteName($instituteName){ $this->instituteName = $instituteName;}

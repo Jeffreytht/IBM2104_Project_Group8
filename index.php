@@ -65,7 +65,7 @@ $body = <<< BODY
 								<img src='images/home/college-inti.jpg' height=200px width=100% class='img-fluid' alt=''>
 								<div class='mask rgba-white-slight'></div>
 							</div>
-							<h4 class='my-4 font-weight-bold'>INTI College Subang</h4>
+							a href='my_account.php'><h4 class='my-4 font-weight-bold'>INTI College Subang</h4>
 						</div>
 <!--END COLLEGE 1-->
 

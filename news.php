@@ -78,11 +78,7 @@ BODY;
 			else
 				echo"Error.SQL execute failed.".$conn->error;
 			
-			
-			
-			
-			
-			
+
 echo <<<BODY
 
 				<style>
@@ -98,18 +94,8 @@ echo <<<BODY
 						<div class='bg-white mt-3 px-3 py-3 mb-3'>
 							<h3 class='font-weight-bold'><i class='far fa-newspaper pr-2'></i>News</h3>
 						</div>
-						
-						
-						
-						
 
 									$news
-									
-									
-									
-									
-
-						
 						
 					</div>
 				</div>

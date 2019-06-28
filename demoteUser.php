@@ -17,7 +17,9 @@
 	if($conn->connect_error)
 		die("Conenction failed". $conn->connect_error);
 
-	$sql = "UPDATE `user_role` SET role_id = 3 WHERE user_id = $_POST[id]";
+	$id = $conn->real_escape_string($_POST["id"]);
+
+	$sql = "UPDATE `user_role` SET role_id = 3 WHERE user_id = $id";
 
 	#Check whether the query is valid
 	if(!($conn->query($sql)))

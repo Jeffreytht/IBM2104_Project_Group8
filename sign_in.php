@@ -34,8 +34,8 @@
 		#Store user's input into temporary normal user object
 		if(isset($_POST["username"]) && isset($_POST["username"]))
 		{
-			$user->setUsername(htmlspecialchars(strtolower($_POST["username"])));
-			$user->setPwd(htmlspecialchars($_POST["pwd"]));
+			$user->setUsername(strtolower($_POST["username"]));
+			$user->setPwd($_POST["pwd"]);
 		}
 
 		#Create a connection with mysql database
@@ -44,9 +44,11 @@
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die("Connection fail". $conn->connect_error);
+
+		$username = $conn->real_escape_string($user->getUsername());
 		
 		#SQL command to call the stored procedure in database
-		$sql = "CALL AuthenticateUser(\"{$user->getUsername()}\")";
+		$sql = "CALL AuthenticateUser(\"$username\")";
 
 		#Check whether the query is valid
 		#Return username and password
@@ -74,7 +76,7 @@
 						die("Connection fail". $conn->connect_error);
 
 					#Sql command to call stored procedure in mysql database
-				    $sql = "CALL SelectAllUserDetailsByUsername(\"{$user->getUsername()}\")";
+				    $sql = "CALL SelectAllUserDetailsByUsername(\"$username\")";
 
 				    #Check whether the query is valid
 				    if($result = $conn->query($sql))

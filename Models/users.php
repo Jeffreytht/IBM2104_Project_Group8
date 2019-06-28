@@ -22,13 +22,13 @@
 		public function setPwd($pwd){$this->pwd = $pwd;}
 		public function setRetypePwd($retypePwd){$this->retypePwd = $retypePwd;}
 		public function setDob($dob){$this->dob = $dob;}
-		public function getUserID(){return $this->userID;}
-		public function getUsername(){return $this->username;}
-		public function getEmail(){return $this->email;}
-		public function getPwd(){return $this->pwd;}
-		public function getRetypePwd(){return $this->retypePwd;}
-		public function getdob(){return $this->dob;}
-		public function getRoleId(){return $this->roleID;}
+		public function getUserID(){return htmlspecialchars($this->userID);}
+		public function getUsername(){return htmlspecialchars($this->username);}
+		public function getEmail(){return htmlspecialchars($this->email);}
+		public function getPwd(){return htmlspecialchars($this->pwd);}
+		public function getRetypePwd(){return htmlspecialchars($this->retypePwd);}
+		public function getdob(){return htmlspecialchars($this->dob);}
+		public function getRoleId(){return htmlspecialchars($this->roleID);}
 
 		/**
 			Print date in readable format

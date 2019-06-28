@@ -15,9 +15,11 @@
 	#Load Composer's autoloader
 	require 'vendor/autoload.php';
 
+	set_time_limit(0);
+
 	#Instantiation and passing `true` enables exceptions
 	$mail = new PHPMailer(true);
-		session_start();
+	session_start();
 	
 	#Redirect user to homepage if user had sign in already
 	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
@@ -41,6 +43,7 @@
 
 	$randomNum = "";
 	$tacCode = "";
+	$is_valid = TRUE;
 
 	#Validate registration input 
 	function validateData()
@@ -49,6 +52,7 @@
 		global $errorMessage;
 		global $user;
 		global $randomNum;
+		global $is_valid;
 
 		#Indicate whether all the input are valid
 		$is_valid = TRUE;
@@ -64,12 +68,55 @@
 		#Register successfully if all the input are valid
 		if($is_valid)
 		{
-			if(!isset($_SESSION['randomNum']) && $_POST)
+			$conn = new mysqli(SERVER,USER,PASS,DB);
+
+			if($conn->connect_error)
+				die("Connection error. ". $conn->connect_error);
+
+			$sql = "SELECT * FROM `taccode` WHERE user_name = \"{$user->getUsername()}\"";
+			$result = $conn->query($sql);
+			$tacCode = $result->fetch_assoc()['code'];
+			$conn->close();
+
+			if(isset($_POST['tacCode'])&& $_POST['tacCode'] == $tacCode)
+			{
+				$conn = new mysqli(SERVER, USER, PASS, DB);
+				if($conn->connect_error)
+					die("Connection Error. ".$conn->connect_error());
+				$sql = "DELETE FROM `taccode` WHERE user_name = \"{$user->getUsername()}\"";
+				$conn->query($sql);
+				$conn->close();
+				saveResult();
+			}
+
+			else if(isset($_POST['tacCode']))
+			{
+				$conn = new mysqli(SERVER, USER, PASS, DB);
+				if($conn->connect_error)
+					die("Connection Error. ".$conn->connect_error());
+				$sql = "DELETE FROM `taccode` WHERE user_name = \"{$user->getUsername()}\"";
+				$conn->query($sql);
+				$conn->close();
+				$tacCode = "";
+				$errorMessage[5] = "Incorrect Tac Code! A new tac code has been send.";
+			}
+
+			if(empty($tacCode) && $_POST)
 			{	
 				for($i = 0 ; $i < 6 ; $i++)
 					$randomNum .= rand(0,9);
 
-				$_SESSION['randomNum'] = $randomNum;
+				$conn = new mysqli(SERVER, USER, PASS, DB);
+				if($conn->connect_error)
+					die("Connection Error. ".$conn->connect_error());
+
+				$sql = "INSERT INTO `taccode` VALUES(\"{$user->getUsername()}\", \"$randomNum\")";
+
+				if(!($conn->query($sql)))
+					die("Error. ".$conn->connect_error());
+
+				$conn->close();
+
 				try {
 				    //Server settings
 				    global $mail;
@@ -97,17 +144,8 @@
 				    die("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
 				}
 			}
-			else if($_POST['tacCode'] != $_SESSION['randomNum'])
-			{
-				$errorMessage[5] = "Incorrect Tac Code!";
-			}
-			else
-			{
-				unset($_SESSION['randomNum']);
-				saveResult();
-			}
+			
 		}
-
 	}
 
 	#Insert valid user input into database
@@ -123,8 +161,13 @@
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
+		$username = $conn->real_escape_string($_POST["username"]);
+		$email = $conn->real_escape_string($_POST["email"]);
+		$pwd = $conn->real_escape_string($_POST["pwd"]);
+		$dob = $conn->real_escape_string($_POST["dob"]);
+
 		#SQL command to call the stored procedure in database.
-		$sql = "CALL InsertUser(\"$_POST[username]\", \"$_POST[email]\", \"$_POST[pwd]\", \"$_POST[dob]\");";
+		$sql = "CALL InsertUser(\"$username\", \"$email\", \"$pwd\", \"$dob\");";
 
 		#Register successfully and insert user's information into database
 		if($result = $conn->query($sql))
@@ -199,11 +242,11 @@
 	if($_POST)
 	{
 		#Assign user's input into temporary user object
-		$user->setUsername(htmlspecialchars(strtolower($_POST['username'])));
-		$user->setEmail(htmlspecialchars(strtolower($_POST['email'])));
-		$user->setPwd(htmlspecialchars($_POST['pwd']));
-		$user->setRetypePwd(htmlspecialchars($_POST['retypePwd']));
-		$user->setDob(htmlspecialchars($_POST['dob']));
+		$user->setUsername(strtolower($_POST['username']));
+		$user->setEmail(strtolower($_POST['email']));
+		$user->setPwd($_POST['pwd']);
+		$user->setRetypePwd($_POST['retypePwd']);
+		$user->setDob($_POST['dob']);
 
 		#validate user's input
 		validateData();
@@ -211,7 +254,7 @@
 	
 /********************************* GENERATE VIEW **************************************/
 
-if(isset($_SESSION['randomNum']) && $_POST)
+if($_POST && $is_valid)
 $tacCode = <<<TACCODE
 	<div class='md-form'>
 		<i class='fa fa-envelope prefix purple-text'></i>
