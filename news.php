@@ -57,16 +57,19 @@ BODY;
 								if($result1->num_rows > 0)
 								{
 									
-								while($output1 = $result1->fetch_assoc()){
-									global $news;
-									$news.=<<<BODY
-									
-									<center><img src='$output1[image_path]' class='img-fluid rounded'></center>
-				
+									while($output1 = $result1->fetch_assoc()){
+										global $news;
+										$news.=<<<BODY
+										
+										<center><img src='$output1[image_path]' class='img-fluid rounded'></center>
+					
 BODY;
+									}
+								
 								}
+								
 								$news.="</div></div>";
-							}
+							
 							}
 							else
 								echo"Error.SQL execute failed.".$conn->error;
@@ -75,12 +78,8 @@ BODY;
 			else
 				echo"Error.SQL execute failed.".$conn->error;
 			
-			
-			
-			
-			
-			
-echo"
+
+echo <<<BODY
 
 				<style>
 				.news {
@@ -95,23 +94,13 @@ echo"
 						<div class='bg-white mt-3 px-3 py-3 mb-3'>
 							<h3 class='font-weight-bold'><i class='far fa-newspaper pr-2'></i>News</h3>
 						</div>
-						
-						
-						
-						
 
 									$news
-									
-									
-									
-									
-
-						
 						
 					</div>
 				</div>
 
-";
+BODY;
 
 			echo "<!DOCTYPE html>";
 				echo "<html lang='en'>";
