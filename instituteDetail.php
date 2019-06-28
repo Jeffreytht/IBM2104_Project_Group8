@@ -7,13 +7,6 @@
 	require_once("models/superadmin.php");
 	require_once("models/institute.php");
 	require_once("models/news.php");
-	session_start();
-
-	#Define constant variable to store attribute of mysql server
-	define("SERVER", "localhost");
-	define("USER","root");
-	define("PASS","");
-	define("DB","college_portal");
 
 	#Store the url of the page
 	$self = htmlspecialchars($_SERVER['PHP_SELF']);
@@ -64,8 +57,12 @@
 			if($conn->connect_error)
 				die ("Connection Failed".$conn->connect_error);
 
+			$postRate = $conn->real_escape_string($_POST["rate"]);
+			$userID = $conn->real_escape_string($userID);
+			$institute_id = $conn->real_escape_string($institute_id);
+
 			#SQL command to insert rating
-			$sql = "INSERT INTO `rate` VALUES($userID , $institute_id, $_POST[rate])";
+			$sql = "INSERT INTO `rate` VALUES($userID , $institute_id, $postRate)";
 			if(!$conn->query($sql))
 				echo $conn->error;
 
@@ -92,6 +89,8 @@
 	if($conn->connect_error)
 		die ("Connection Failed".$conn->connect_error);
 
+	$institute_id = $conn->real_escape_string($institute_id);
+
 	#SQL command to call the stored procedure in database 
 	$sql = "CALL SelectInstituteDetails($institute_id)";
 
@@ -109,6 +108,8 @@
 	#Close the page if unable to create connection
 	if($conn->connect_error)
 		die ("Connection Failed".$conn->connect_error);
+
+	$institute_id = $conn->real_escape_string($institute_id);
 
 	$sql = "SELECT g.image_path 
 			FROM institute_logo il, gallery g 
@@ -140,6 +141,8 @@
 	#Close the page if unable to create connection
 	if($conn->connect_error)
 		die ("Connection Failed".$conn->connect_error);
+
+	$institute_id = $conn->real_escape_string($institute_id);
 
 	#SQL command that call the stored procedure in database
 	$sql = "CALL SelectInstituteCourse($institute_id)";
@@ -217,6 +220,9 @@ RATE;
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
+
+		$userID = $conn->real_escape_string($userID);
+		$institute_id = $conn->real_escape_string($institute_id);
 	
 		$sql = "SELECT * FROM `rate` WHERE user_id = $userID && institute_id = $institute_id";
 

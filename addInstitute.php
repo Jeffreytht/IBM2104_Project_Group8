@@ -142,6 +142,13 @@
 		{
 			#Create a connection to insert institute information into database
 			$conn = new mysqli(SERVER,USER,PASS,DB);
+			$instituteName = $conn->real_escape_string($instituteName);
+			$instituteAddress = $conn->real_escape_string($instituteAddress);
+			$instituteAddressURL = $conn->real_escape_string($instituteAddressURL);
+			$instituteIFrame = $conn->real_escape_string($instituteIFrame);
+			$stateID = $conn->real_escape_string($stateID);
+			$admin = $conn->real_escape_string($admin);
+
 			$sql = "INSERT INTO `institute` (institute_name, address, address_url, iframe_url,state_id)
 					VALUES(\"$instituteName\", \"$instituteAddress\", \"$instituteAddressURL\", \"$instituteIFrame\",$stateID)";
 			
@@ -173,186 +180,188 @@
 
 			$imageID = 0;
 
-		#Get the image extension
-		$ext = pathinfo($_FILES['profilePic']['name'], PATHINFO_EXTENSION);
+			#Get the image extension
+			$ext = pathinfo($_FILES['profilePic']['name'], PATHINFO_EXTENSION);
+			$fileName = $conn->real_escape_string($_FILES['profilePic']['name']);
 
-		#Create a connection to database to insert an image
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "INSERT INTO `gallery` (image_path)
-				VALUES(\"{$_FILES['profilePic']['name']}\")";
+			#Create a connection to database to insert an image
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "INSERT INTO `gallery` (image_path)
+					VALUES(\"$fileName\")";
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
 
-		$conn->close();
+			$conn->close();
 
-		#Create a connection to database to get the image id
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "SELECT image_id 
-				FROM `gallery`
-				WHERE image_path = \"{$_FILES['profilePic']['name']}\"";
+			#Create a connection to database to get the image id
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "SELECT image_id 
+					FROM `gallery`
+					WHERE image_path = \"{$fileName}\"";
 
-		if($result = $conn->query($sql))
-			$imageID = $result->fetch_assoc()['image_id'];
-		else
-			die("Error. SQL execute failed". $conn->error);
+			if($result = $conn->query($sql))
+				$imageID = $result->fetch_assoc()['image_id'];
+			else
+				die("Error. SQL execute failed". $conn->error);
 
-		$conn->close();
+			$conn->close();
 
-		#Set the image destination and rename the image
-		$imageDestination = "images/profile/".$imageID.".".$ext;
+			#Set the image destination and rename the image
+			$imageDestination = "images/profile/".$imageID.".".$ext;
 
-		#Create a connection to database to rename the image path
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "UPDATE `gallery`
-				SET image_path = \"$imageDestination\"
-				WHERE image_id = $imageID";
+			#Create a connection to database to rename the image path
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "UPDATE `gallery`
+					SET image_path = \"$imageDestination\"
+					WHERE image_id = $imageID";
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
 
-		$conn->close();	
+			$conn->close();	
 
-		#Upload the image to specific folder
-		move_uploaded_file($_FILES['profilePic']['tmp_name'], $imageDestination);
-
-
-		#Conenct to database to insert the image path and institute id
-		$conn = new mysqli(SERVER,USER,PASS,DB);
-
-		#Close the page if unable to create connection
-		if($conn->connect_error)
-			die ("Connection Failed".$conn->connect_error);
-
-		$sql = "INSERT INTO `profile_pic`
-   				VALUES($instituteID, $imageID);" ;
-
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed.".$conn->error);
-		
-		$conn->close();
+			#Upload the image to specific folder
+			move_uploaded_file($_FILES['profilePic']['tmp_name'], $imageDestination);
 
 
-		#Get the image extension
-		$ext = pathinfo($_FILES['coverPic']['name'], PATHINFO_EXTENSION);
+			#Conenct to database to insert the image path and institute id
+			$conn = new mysqli(SERVER,USER,PASS,DB);
 
-		#Create a connection to database to insert an image
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "INSERT INTO `gallery` (image_path)
-				VALUES(\"{$_FILES['coverPic']['name']}\")";
+			#Close the page if unable to create connection
+			if($conn->connect_error)
+				die ("Connection Failed".$conn->connect_error);
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
+			$sql = "INSERT INTO `profile_pic`
+	   				VALUES($instituteID, $imageID);" ;
 
-		$conn->close();
-
-		#Create a connection to database to get the image id
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "SELECT image_id 
-				FROM `gallery`
-				WHERE image_path = \"{$_FILES['coverPic']['name']}\"";
-
-		if($result = $conn->query($sql))
-			$imageID = $result->fetch_assoc()['image_id'];
-		else
-			die("Error. SQL execute failed". $conn->error);
-
-		$conn->close();
-
-		#Set the image destination and rename the image
-		$imageDestination = "images/cover/".$imageID.".".$ext;
-
-		#Create a connection to database to rename the image path
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "UPDATE `gallery`
-				SET image_path = \"$imageDestination\"
-				WHERE image_id = $imageID";
-
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
-
-		$conn->close();	
-
-		#Upload the image to specific folder
-		move_uploaded_file($_FILES['coverPic']['tmp_name'], $imageDestination);
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed.".$conn->error);
+			
+			$conn->close();
 
 
-		#Conenct to database to insert the image path and institute id
-		$conn = new mysqli(SERVER,USER,PASS,DB);
+			#Get the image extension
+			$ext = pathinfo($_FILES['coverPic']['name'], PATHINFO_EXTENSION);
+			$fileName = $conn->real_escape_string($_FILES['coverPic']['name']);
 
-		#Close the page if unable to create connection
-		if($conn->connect_error)
-			die ("Connection Failed".$conn->connect_error);
+			#Create a connection to database to insert an image
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "INSERT INTO `gallery` (image_path)
+					VALUES(\"$fileName\")";
 
-		$sql = "INSERT INTO `cover_photo`
-   				VALUES($instituteID, $imageID);" ;
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed.".$conn->error);
-		
-		$conn->close();
+			$conn->close();
 
+			#Create a connection to database to get the image id
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "SELECT image_id 
+					FROM `gallery`
+					WHERE image_path = \"$fileName\"";
 
-		#Get the image extension
-		$ext = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+			if($result = $conn->query($sql))
+				$imageID = $result->fetch_assoc()['image_id'];
+			else
+				die("Error. SQL execute failed". $conn->error);
 
-		#Create a connection to database to insert an image
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "INSERT INTO `gallery` (image_path)
-				VALUES(\"{$_FILES['logo']['name']}\")";
+			$conn->close();
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
+			#Set the image destination and rename the image
+			$imageDestination = "images/cover/".$imageID.".".$ext;
 
-		$conn->close();
+			#Create a connection to database to rename the image path
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "UPDATE `gallery`
+					SET image_path = \"$imageDestination\"
+					WHERE image_id = $imageID";
 
-		#Create a connection to database to get the image id
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "SELECT image_id 
-				FROM `gallery`
-				WHERE image_path = \"{$_FILES['logo']['name']}\"";
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
 
-		if($result = $conn->query($sql))
-			$imageID = $result->fetch_assoc()['image_id'];
-		else
-			die("Error. SQL execute failed". $conn->error);
+			$conn->close();	
 
-		$conn->close();
-
-		#Set the image destination and rename the image
-		$imageDestination = "images/logo/".$imageID.".".$ext;
-
-		#Create a connection to database to rename the image path
-		$conn = new mysqli(SERVER, USER, PASS, DB);
-		$sql = "UPDATE `gallery`
-				SET image_path = \"$imageDestination\"
-				WHERE image_id = $imageID";
-
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed". $conn->error);
-
-		$conn->close();	
-
-		#Upload the image to specific folder
-		move_uploaded_file($_FILES['logo']['tmp_name'], $imageDestination);
+			#Upload the image to specific folder
+			move_uploaded_file($_FILES['coverPic']['tmp_name'], $imageDestination);
 
 
-		#Conenct to database to insert the image path and institute id
-		$conn = new mysqli(SERVER,USER,PASS,DB);
+			#Conenct to database to insert the image path and institute id
+			$conn = new mysqli(SERVER,USER,PASS,DB);
 
-		#Close the page if unable to create connection
-		if($conn->connect_error)
-			die ("Connection Failed".$conn->connect_error);
+			#Close the page if unable to create connection
+			if($conn->connect_error)
+				die ("Connection Failed".$conn->connect_error);
 
-		$sql = "INSERT INTO `institute_logo`
-   				VALUES($instituteID, $imageID);" ;
+			$sql = "INSERT INTO `cover_photo`
+	   				VALUES($instituteID, $imageID);" ;
 
-		if(!($conn->query($sql)))
-			die("Error. SQL execute failed.".$conn->error);
-		
-		$conn->close();
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed.".$conn->error);
+			
+			$conn->close();
 
-		header("Location:maintenance.php");
+
+			#Get the image extension
+			$ext = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+			$fileName = $conn->real_escape_string($_FILES['logo']['name']);
+			#Create a connection to database to insert an image
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "INSERT INTO `gallery` (image_path)
+					VALUES(\"$fileName\")";
+
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
+
+			$conn->close();
+
+			#Create a connection to database to get the image id
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "SELECT image_id 
+					FROM `gallery`
+					WHERE image_path = \"$fileName\"";
+
+			if($result = $conn->query($sql))
+				$imageID = $result->fetch_assoc()['image_id'];
+			else
+				die("Error. SQL execute failed". $conn->error);
+
+			$conn->close();
+
+			#Set the image destination and rename the image
+			$imageDestination = "images/logo/".$imageID.".".$ext;
+
+			#Create a connection to database to rename the image path
+			$conn = new mysqli(SERVER, USER, PASS, DB);
+			$sql = "UPDATE `gallery`
+					SET image_path = \"$imageDestination\"
+					WHERE image_id = $imageID";
+
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed". $conn->error);
+
+			$conn->close();	
+
+			#Upload the image to specific folder
+			move_uploaded_file($_FILES['logo']['tmp_name'], $imageDestination);
+
+
+			#Conenct to database to insert the image path and institute id
+			$conn = new mysqli(SERVER,USER,PASS,DB);
+
+			#Close the page if unable to create connection
+			if($conn->connect_error)
+				die ("Connection Failed".$conn->connect_error);
+
+			$sql = "INSERT INTO `institute_logo`
+	   				VALUES($instituteID, $imageID);" ;
+
+			if(!($conn->query($sql)))
+				die("Error. SQL execute failed.".$conn->error);
+			
+			$conn->close();
+
+			header("Location:maintenance.php");
 		}
 	}
 	echo "<html>";

@@ -5,8 +5,8 @@
 		private $imagePath;
 
 		#Getter and setter
-		public function getImageID(){return $this->imageID;}
-		public function getImagePath(){return $this->imagePath;}
+		public function getImageID(){return htmlspecialchars($this->imageID);}
+		public function getImagePath(){return htmlspecialchars($this->imagePath);}
 		public function setImageID($imageID){$this->imageID = $imageID;}
 		public function setImagePath($imagePath){$this->imagePath = $imagePath;}
 

@@ -14,10 +14,11 @@
 	$conn = new mysqli(SERVER, USER, PASS, DB);
 
 	if($conn->connect_error)
-			die ("Connection Failed".$conn->connect_error);
+		die ("Connection Failed".$conn->connect_error);
 
+	$id = $conn->real_escape_string($_POST["id"]);
 	#SQL command that store the stored procedure in database
-	$sql = "CALL DeleteInstituteByID($_POST[id])";
+	$sql = "CALL DeleteInstituteByID($id)";
 
 	if(!($conn->query($sql)))
 		echo "Error. SQL execute failed.".$conn->error;   

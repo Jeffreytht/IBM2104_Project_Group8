@@ -34,8 +34,9 @@
 		#Close the page if unable to create connection
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
-
-		$sql = "SELECT * FROM institute WHERE institute_name LIKE \"%$_POST[searchInstitute]%\"";
+		
+		$searchInstitute = $_POST["searchInstitute"];
+		$sql = "SELECT * FROM institute WHERE institute_name LIKE \"%$searchInstitute%\"";
 
 		#Check whether the query is valid
 		#Select institute details based on institute name
@@ -57,17 +58,20 @@
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
+		$postCourse = $conn->real_escape_string($_POST["course"]);
+		$postLocation = $conn->real_escape_string($_POST["location"]);
+
 		$sql = "SELECT i.*, s.state_name 
 				FROM `institute` i, `state` s
 				WHERE i.institute_id IN 
 				(
 					SELECT ic.institute_id 
 					FROM `institute_course` ic, `course` c
-					WHERE c.course_name = \"$_POST[course]\" 
+					WHERE c.course_name = \"$postCourse\" 
 					&& ic.course_id = c.course_id
 				)
 				&& i.state_id = s.state_id 
-				&& s.state_name = \"$_POST[location]\"
+				&& s.state_name = \"$postLocation\"
 				";
 
 		#Check whether the query is valid
@@ -89,13 +93,15 @@
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
+		$postCourse = $conn->real_escape_string($_POST["course"]);
+
 		$sql = "SELECT * 
 				FROM `institute` 
 				WHERE institute_id IN 
 				(
 					SELECT institute_id 
 					FROM `institute_course` ic, `course` c 
-					WHERE c.course_name = \"$_POST[course]\" && ic.course_id = c.course_id
+					WHERE c.course_name = \"$postCourse\" && ic.course_id = c.course_id
 				)";
 
 		#Check whether the query is valid.
@@ -117,9 +123,11 @@
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
+		$postLocation = $conn->real_escape_string($_POST["location"]);
+
 		$sql = "SELECT i.*, s.state_name 
 				FROM `institute` i, `state` s 
-				WHERE i.state_id = s.state_id && s.state_name = \"$_POST[location]\"";
+				WHERE i.state_id = s.state_id && s.state_name = \"$postLocation\"";
 		
 		#Check whether the query is valid.
 		#Select institute details based on the location

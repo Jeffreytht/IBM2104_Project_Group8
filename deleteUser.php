@@ -17,8 +17,10 @@
 	if($conn->connect_error)
 		die ("Connection Failed".$conn->connect_error);
 
+	$id = $conn->real_escape_string($_POST["id"]);
+	
 	#Stored procedure in database
-	$sql = "CALL DeleteUser($_POST[id])";
+	$sql = "CALL DeleteUser($id)";
 	
 	if(!($conn->query($sql)))
 		echo "Error. SQL execute failed.".$conn->error;   

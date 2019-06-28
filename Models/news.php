@@ -8,10 +8,10 @@
 		private $timeStamp;
 
 		#Getter and setter
-		public function getNewsID() {return $this->newsID;}
-		public function getContent(){return $this->content;}
+		public function getNewsID() {return htmlspecialchars($this->newsID);}
+		public function getContent(){return htmlspecialchars($this->content);}
 		public function getImage(){return $this->image;}
-		public function getTimeStamp(){return $this->timeStamp;}
+		public function getTimeStamp(){return htmlspecialchars($this->timeStamp);}
 		public function setContent($content){$this->content = $content;}
 		public function setImage ($image){$this->image = $image;}
 

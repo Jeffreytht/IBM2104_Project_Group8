@@ -161,8 +161,13 @@
 		if($conn->connect_error)
 			die ("Connection Failed".$conn->connect_error);
 
+		$username = $conn->real_escape_string($_POST["username"]);
+		$email = $conn->real_escape_string($_POST["email"]);
+		$pwd = $conn->real_escape_string($_POST["pwd"]);
+		$dob = $conn->real_escape_string($_POST["dob"]);
+
 		#SQL command to call the stored procedure in database.
-		$sql = "CALL InsertUser(\"$_POST[username]\", \"$_POST[email]\", \"$_POST[pwd]\", \"$_POST[dob]\");";
+		$sql = "CALL InsertUser(\"$username\", \"$email\", \"$pwd\", \"$dob\");";
 
 		#Register successfully and insert user's information into database
 		if($result = $conn->query($sql))
@@ -237,11 +242,11 @@
 	if($_POST)
 	{
 		#Assign user's input into temporary user object
-		$user->setUsername(htmlspecialchars(strtolower($_POST['username'])));
-		$user->setEmail(htmlspecialchars(strtolower($_POST['email'])));
-		$user->setPwd(htmlspecialchars($_POST['pwd']));
-		$user->setRetypePwd(htmlspecialchars($_POST['retypePwd']));
-		$user->setDob(htmlspecialchars($_POST['dob']));
+		$user->setUsername(strtolower($_POST['username']));
+		$user->setEmail(strtolower($_POST['email']));
+		$user->setPwd($_POST['pwd']);
+		$user->setRetypePwd($_POST['retypePwd']);
+		$user->setDob($_POST['dob']);
 
 		#validate user's input
 		validateData();
