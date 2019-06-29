@@ -13,6 +13,7 @@ session_start();
 			
 			$news = "";
 			
+			
 			#Create a connection to database to get the news based on the searching criteria
 			$conn = new mysqli(SERVER,USER,PASS,DB);
 			
@@ -38,14 +39,14 @@ session_start();
 								
 								<!--Name & Time-->
 								<div class='col-md-9 ml-0 pl-0 align-items-center'>
-									<h4 class='font-weight-bold mb-0 pb-0'>$output[institute_name]</h4>
-									<span class='mt-0 pt-0' style='font-size:10px'>$output[news_date]</span>
+									<h3 class='font-weight-bold mb-0 pb-0'>$output[institute_name]</h3>
+									<span class='mt-0 pt-0' style='font-size:13px'>$output[news_date]</span>
 								</div>
 							</div>
 							
 							<!--Content-->
 							<h6>$output[content]</h6>
-							<div class="w-100">
+							
 
 						
 BODY;
@@ -56,19 +57,52 @@ BODY;
 							if($result1 = $conn2->query($pic)){
 								if($result1->num_rows > 0)
 								{
+									$count = 0;
+									$size = $result1->num_rows;
 									
-									while($output1 = $result1->fetch_assoc()){
-										global $news;
-										$news.=<<<BODY
+									for($j = 0 ; $j < $size ; $j++){
 										
-										<center><img src='$output1[image_path]' class='img-fluid rounded'></center>
-					
+										while($output1 = $result1->fetch_assoc()){
+											global $news;
+											
+											#Create a new row for every 3 lines
+											if($count % 3 == 0)
+											{
+												#indicate whether the row is end
+												$endRow = FALSE;
+												$news.= "<div class='row mt-3' style='overflow:hidden'>";
+											}
+											
+											$news.=<<<BODY
+											<div class='col-md-4' id='galCol'>
+											<center><img src='$output1[image_path]' class='img-fluid rounded border'></center>
+											</div>
 BODY;
+											
+											#Check whether the row is end
+											if(($count + 1) % 3 == 0)
+											{
+												$endRow = TRUE;
+												$news.="</div>";
+											}	
+
+											$count++;
+
+										}
+										
+										#If the gallery image row havent end, end it
+										if(!$endRow)
+											$news.="</div>";
 									}
+									
+									
+									
 								
 								}
 								
-								$news.="</div></div>";
+								
+								
+								$news.="</div>";
 							
 							}
 							else

@@ -38,15 +38,15 @@ echo <<< FOOTER
                     <hr class='deep-purple accent-2 mb-4 mt-0 d-inline-block mx-auto' style='width: 60px;'>
                     <p>
                         <i class='fa fa-envelope mr-3'></i>
-                        GODs@gmail.com
+                        <a href="mailto:GODs@gmail.com">GODs@gmail.com</a>
                     </p>
                     <p>
                         <i class='fa fa-phone mr-3'></i>
-                        + 01 234 567 88
+                        <a href="tel:+0123456788">+ 01 234 567 88</a>
                     </p>
                     <p>
                         <i class='fa fa-print mr-3'></i>
-                        + 01 234 567 89
+                        <a href="fax:+0123456789">+ 01 234 567 89</a>
                     </p>
                 </div>
 <!--END CONTACT-->

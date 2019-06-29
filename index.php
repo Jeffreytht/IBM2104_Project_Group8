@@ -31,6 +31,50 @@
 
 
 /*******************************GENERATE VIEW*********************************/
+
+
+	#<!--GET INSTITUTE-->
+		
+		#Define constant variable to store attribute of mysql server
+		define("SERVER", "localhost");
+		define("USER","root");
+		define("PASS","");
+		define("DB","college_portal");
+		
+		$institute = "";
+			
+		#Create a connection to database to get the institute based on the searching criteria
+		$conn = new mysqli(SERVER,USER,PASS,DB);
+		
+		#Close the page if unable to create connection
+		if($conn->connect_error)
+			die("Connection error.".$conn->connect_error);
+		
+		$sql = "CALL GetAllCollege()";
+		
+		#Check whether the query is valid.
+		if($result = $conn->query($sql)){
+			while($output = $result->fetch_assoc()){
+				global $institute;
+				$institute.=<<<BODY
+				
+					<div class='col-lg-4 col-md-12 mb-4'>
+						<div class='view overlay z-depth-1-half'>
+							<img src='$output[image_path]' height=200px width=100%>
+							<div class='mask rgba-white-slight'></div>
+						</div>
+						<a href='institute.php?id=$output[institute_id]'>
+							<h4 class='my-4 font-weight-bold' style='color:#000000'>$output[institute_name]</h4>
+						</a>
+					</div>			
+					
+BODY;
+							
+			}
+		}
+		else
+			echo"Error.SQL execute failed.".$conn->error;
+
 $body = <<< BODY
 
 <!--OVERLAY BACKGROUND-->	
@@ -54,77 +98,18 @@ $body = <<< BODY
 	</header>
 <!--END OVERLAY BACKGROUND-->
 
-		<main class='mt-5 mb-5 main'>
-			<div class='container' id='college_in_Malaysia'>
-				<section id='examples' class='text-center'>
-					<h2 class='mb-5 font-weight-bold'>Institute in Malaysia</h2>
-					<div class='row'>
-<!--COLLEGE 1-->
-						<div class='col-lg-4 col-md-12 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-inti.jpg' height=200px width=100% class='img-fluid' alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							a href='my_account.php'><h4 class='my-4 font-weight-bold'>INTI College Subang</h4>
-						</div>
-<!--END COLLEGE 1-->
+<main class='mt-5 mb-5 main'>
+	<div class='container' id='college_in_Malaysia'>
+		<section id='examples' class='text-center'>
+			<h2 class='mb-5 font-weight-bold'>Institute in Malaysia</h2>
+			<div class='row'>
+				$institute
+			</div>						
+			<a href='institute.php' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</a>				
+		</section>
+	</div>
+</main>
 
-<!--COLLEGE 2-->
-						<div class='col-lg-4 col-md-6 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-segi.jpg' height=200px width=100% alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							<h4 class='my-4 font-weight-bold'>SEGI College Penang</h4>
-						</div>
-<!--END COLLEGE 2-->
-
-<!--COLLEGE 3-->
-						<div class='col-lg-4 col-md-6 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-tarc.jpg' height=200px width=100% alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							<h4 class='my-4 font-weight-bold'>Tunku Abdul Rahman College Kuala Lumpur</h4>
-						</div>
-<!--END COLLEGE 3-->
-					</div>
-
-					<div class='row'>
-<!--COLLEGE 4-->
-						<div class='col-lg-4 col-md-12 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-kdu.jpg' height=200px width=100% alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							<h4 class='my-4 font-weight-bold'>KDU College Penang</h4>
-						</div>
-<!--END COLLEGE 4-->
-
-<!--COLLEGE 5-->
-						<div class='col-lg-4 col-md-6 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-equator.jpg' height=200px width=100% alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							<h4 class='my-4 font-weight-bold'>Equator College Penang</h4>
-						</div>
-<!--END COLLEGE 5-->
-
-<!--COLLEGE 6-->
-						<div class='col-lg-4 col-md-6 mb-4'>
-							<div class='view overlay z-depth-1-half'>
-								<img src='images/home/college-medical.jpg' height=200px width=100% alt=''>
-								<div class='mask rgba-white-slight'></div>
-							</div>
-							<h4 class='my-4 font-weight-bold'>Penang Medical College</h4>
-						</div>
-<!--END COLLEGE 6-->
-					</div>						
-					<a href='institute.php' class='btn btn-outline-secondary btn-rounded waves-effect'>View More</a>				
-				</section>
-			</div>
-		</main>
 BODY;
 
 /******************************************VIEW*******************************************/
