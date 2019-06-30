@@ -271,13 +271,13 @@ NEW;
 			{
 				#indicate whether the row is end
 				$endRow = FALSE;
-				$image.= "<div class='row mt-2'>";
+				$image.= "<div class='row mt-2 px-3'>";
 			}
 
 			$image.= 
 			<<<IMAGE
-				<div class="col-md-4" id="galCol" style="overflow:hidden;">
-					<img src="{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage img-fluid rounded border" style="min-width:100%" >
+				<div class="col-md-4 rounded border pl-0" id="galCol" style="overflow:hidden;">
+					<img src="{$institute->getNews()[$i]->getImage()[$j]->getImagePath()}" class="galImage " style="min-width:100%" >
 				</div>
 IMAGE;
 			#Check whether the row is end
@@ -334,7 +334,7 @@ $body = <<<BODY
 			</div>
 			<div class="rounded border tab-content mt-2 mb-5">
 	  			<div class="tab-pane active container p-3" id="overview">
-	  			<div class="row"><div class="col-md-4"  id="loadGallery"></div></div>
+	  				<div class="row"><div class="col-md-4" id="loadGallery"></div></div>
 	  				<div class="row">
 	  					<div class="col-md-5 pl-0">
 	  						<div class="bg-white border rounded px-4 py-3 mb-3">

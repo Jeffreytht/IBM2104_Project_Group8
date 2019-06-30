@@ -185,3 +185,8 @@ header,
 {
   cursor:pointer;
 }
+
+.news {
+  width: 800px;
+  margin-top: 98px;
+}
