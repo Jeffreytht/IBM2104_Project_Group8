@@ -28,7 +28,7 @@
 
 			$news.=<<<BODY
 <!--Logo-->
-			<div class='mb-3 bg-white w-100 pl-5 pt-3 pb-4 '>		
+			<div class='mb-3 bg-white w-100 pl-5 pt-3 pb-4 rounded'>		
 				<div class='row mb-3'>
 					<div>
 						<img src= $output[image_path] class="circle-news-image border" >
@@ -76,7 +76,7 @@ BODY;
 							
 							$news.=<<<BODY
 							<div class='col-md-4 pl-0 border rounded' style='overflow:hidden'>
-								<center><img src='$output2[image_path]' class='galImage'></center>
+								<center><img src='$output2[image_path]' class='galImage	'></center>
 							</div>
 BODY;
 							$count++;
@@ -107,15 +107,15 @@ BODY;
 		echo"Error.SQL execute failed.".$conn->error;
 			
 
-echo <<<BODY
-				<div class='container-fluid d-flex justify-content-center'>
-					<div class='news'>
-						<div class='bg-white mt-3 px-3 py-3 mb-3'>
-							<h3 class='font-weight-bold'><i class='far fa-newspaper pr-2'></i>News</h3>
-						</div>
-						$news
-					</div>
-				</div>
+$body =<<<BODY
+	<div class='container-fluid d-flex justify-content-center mb-5'>
+		<div class='news'>
+			<div class='bg-white mt-3 px-3 py-3 mb-3 rounded'>
+				<h3 class='font-weight-bold'><i class='far fa-newspaper pr-2'></i>News</h3>
+			</div>
+			$news
+		</div>
+	</div>
 
 BODY;
 
@@ -127,6 +127,7 @@ BODY;
 					echo "<body class='bg-light' >";
 						include("nav.php");
 						echo "<main class='main'>";
+						echo $body;
 						echo "</main>";
 						include("footer.php");
 					
