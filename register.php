@@ -20,10 +20,16 @@
 	#Instantiation and passing `true` enables exceptions
 	$mail = new PHPMailer(true);
 	session_start();
-	
+
 	#Redirect user to homepage if user had sign in already
 	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
 		header("Location: index.php");
+
+	echo "<!DOCTYPE html>";
+	echo "<html lang='en'>";
+		echo "<head>";
+			include('header.html');
+		echo "</head>";
 
 	#Define constant variable to store attribute of mysql server
 	define("SERVER", "localhost");
@@ -83,7 +89,7 @@
 			$conn->close();
 
 
-			if(isset($_POST['tacCode'])&& $_POST['tacCode'] == $tacCode)
+			if(isset($_POST['tacCode']) && $_POST['tacCode'] == $tacCode)
 			{
 				$conn = new mysqli(SERVER, USER, PASS, DB);
 				if($conn->connect_error)
@@ -104,7 +110,9 @@
 				$conn->query($sql);
 				$conn->close();
 				$tacCode = "";
-				$errorMessage[5] = "Incorrect Tac Code! A new tac code has been send.";
+
+				if(!isset($_POST['resend']))
+					$errorMessage[5] = "Incorrect Tac Code! A new tac code has been send.";
 			}
 
 			if(empty($tacCode) && $_POST)
@@ -193,6 +201,7 @@
 			    switch($output['role_id'])
 			    {
 			    	case 1:
+
 			    		#Create a super admin object and assign user's information
 			    		$superAdmin = new SuperAdmin();
 			    		$SuperAdmin->assginUser($output);
@@ -204,6 +213,7 @@
 			    	break;
 
 			    	case 2:
+
 			    		#Create an admin object and assign user's information
 			    		$admin = new Admin();
 			    		$admin->assginUser($output);
@@ -215,6 +225,7 @@
 			    	break;
 
 			    	case 3:
+
 			    		#Create an normal user object and assign user's information
 			    		$normalUser = new NormalUser();
 			   			$normalUser->assignUser($output);
@@ -226,9 +237,16 @@
 			    }
 
 			    #Redirect to homepage
-			    echo "<script>";
-				echo "alert('Register Successfully');";
-				echo "window.location.replace(\"index.php\");";
+			   echo "<script>";
+							echo "$('document').ready(function(){
+								swal(
+								  'Good job!',
+								  'Register Successfully!',
+								  'success'
+								).then(function(){
+									window.location.replace(\"index.php\");
+									});
+							});";
 				echo "</script>";
 		    }
 		    else
@@ -259,13 +277,19 @@
 	}
 	
 /********************************* GENERATE VIEW **************************************/
-
 if($_POST && $is_valid)
 $tacCode = <<<TACCODE
 	<div class='md-form'>
 		<i class='fa fa-envelope prefix purple-text'></i>
-		<input mdbActive class='form-control pl-2' type='text' name='tacCode' required autocomplete='off' placeholder='TAC code' />
+		<input mdbActive class='form-control pl-2' type='text' name='tacCode' autocomplete='off' placeholder='TAC code' />
 		<div class="ml-5">A tac code has been sent to {$user->getEmail()}</div>
+		<button class="ml-5 btn btn-info py-1 px-2" id="resend" onclick="addInput()">Resend</button>
+		<script>
+			function addInput()
+			{
+				$("#resend").parent().append("<input type='text' hidden value='true' name='resend' />");
+			}
+		</script>
 		<div class='text-danger ml-5'>$errorMessage[5]</div>
 	</div>
 TACCODE;
@@ -328,11 +352,6 @@ $body =<<<BODY
 BODY;
 
 /***************************************************VIEW**********************************/
-echo "<!DOCTYPE html>";
-	echo "<html lang='en'>";
-		echo "<head>";
-			include('header.html');
-		echo "</head>";
 		echo $body;
 	echo "</html>";
 ?>

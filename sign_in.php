@@ -1,5 +1,4 @@
 <?php
-
 	#Import all the model class required
 	require_once("models/users.php");
 	require_once("models/normalUser.php");
@@ -18,12 +17,24 @@
 	if(isset($_SESSION['user']) || isset($_SESSION['admin'])|| isset($_SESSION['superAdmin']))
 		header("Location:index.php");
 
+	echo "<!DOCTYPE html>";
+	echo "<html lang='en'>";
+		echo "<head>";
+		include("header.html");
+		echo "</head>";
+
 	#Error message of sign in input
 	$errorMessage = array();
 	$errorMessage = array_fill(0,2,"");
 
 	#Create a temporary normal user object to store user's information
 	$user = new NormalUser();
+
+	if(isset($_COOKIE['username']) && isset($_COOKIE['password']))
+	{
+		$user->setUsername($_COOKIE['username']);
+		$user->setPwd($_COOKIE['password']);
+	}
 
 	#Store the url of the page
 	$self = htmlspecialchars("$_SERVER[PHP_SELF]");
@@ -118,13 +129,32 @@
 					    	break;
 					    }
 
+
 					    #Store role id to session
 					    $_SESSION['role'] = $output['role_id'];
 
+					    if(isset($_POST['rmbMe']) && $_POST['rmbMe'] == "yes")
+					    {
+					    	setcookie("username", $output['user_name']);
+					    	setcookie("password", $output['pwd']);
+					    }
+					    else
+					    {
+					    	setcookie('username', '');
+					    	setcookie('password','');
+					    }
+
 					    #Log in successfully and redirect to homepage
 						echo "<script>";
-							echo "alert('Login Successfully');";
-							echo "window.location.replace(\"index.php\");";
+							echo "$('document').ready(function(){
+								swal(
+								  'Good job!',
+								  'Sign In Successfully!',
+								  'success'
+								).then(function(){
+									window.location.replace(\"index.php\");
+									});
+							});";
 						echo "</script>";
 				    }
 				    else
@@ -177,7 +207,7 @@ $body =
 									<div class='d-flex justify-content-around'>
 										<div>
 											<div class='custom-control custom-checkbox'>
-												<input type='checkbox' class='custom-control-input' id='defaultLoginFormRemember'>
+												<input type='checkbox' name="rmbMe" value="yes" class='custom-control-input' id='defaultLoginFormRemember'>
 												<label class='custom-control-label' for='defaultLoginFormRemember'>Remember me</label>
 											</div>
 										</div>
@@ -204,11 +234,7 @@ $body =
 		</body>
 BODY;
 /************************************** VIEW *****************************************/
-	echo "<!DOCTYPE html>";
-	echo "<html lang='en'>";
-		echo "<head>";
-		include("header.html");
-		echo "</head>";
+
 		echo $body;
 	echo "</html>";
 ?>

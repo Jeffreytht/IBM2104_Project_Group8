@@ -371,7 +371,7 @@
 		echo "<body class='bg-light'>";
 		include ("nav.php");
 			echo <<<BODY
-			<main class='main'>
+			<main class='main mb-5'>
 				<div class='container d-flex justify-content-center'>
 					<div class='collegeDetail bg-white px-5 py-3'>	
 						<form class="mt-5" method="post" action="$self" enctype="multipart/form-data">
