@@ -25,6 +25,10 @@
 		while($output = $result->fetch_assoc())
 		{
 			global $news;
+			$output["content"] = htmlspecialchars($output["content"]);
+			$output["image_path"] = htmlspecialchars($output["image_path"]);
+			$output["institute_name"] = htmlspecialchars($output["institute_name"]);
+			$output["news_date"] = htmlspecialchars($output["news_date"]);
 
 			$news.=<<<BODY
 <!--Logo-->

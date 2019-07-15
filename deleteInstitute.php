@@ -20,8 +20,17 @@
 	#SQL command that store the stored procedure in database
 	$sql = "CALL DeleteInstituteByID($id)";
 
-	if(!($conn->query($sql)))
+	if($result = $conn->query($sql))
+	{
+		while($output = $result->fetch_assoc())
+		{
+			unlink($output['path']);
+		}
+	}
+	else
+	{
 		echo "Error. SQL execute failed.".$conn->error;   
+	}
 	
 	$conn->close();
 

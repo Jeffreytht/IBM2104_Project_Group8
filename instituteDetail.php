@@ -309,11 +309,10 @@ $body = <<<BODY
 
 				<div class='mask d-flex mr-auto'>		
 					<img src="{$institute->getProfile()}" class='circle-image ml-5 mb-3 mt-auto'  style="z-index:1;"/>
-
 				</div>
 
 				<div class='mask d-flex justify-content-center'>		
-					<h1 class="font-weight-bold mt-auto mb-5 text-white" style="text-shadow: 1px 1px 2px black;">{$institute->getInstituteName()}</h1>
+					<h1 class="font-weight-bold mt-auto mb-5 ml-auto mr-4 text-white" style="text-shadow: 1px 1px 2px black;">{$institute->getInstituteName()}</h1>
 				</div>
 
 				<div class='mask d-flex'>

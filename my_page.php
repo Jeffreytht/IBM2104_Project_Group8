@@ -39,8 +39,17 @@
 
 		$sql = "CALL DeleteNewsByNewsID($_POST[newsID])";
 
-		if(!($conn->query($sql)))
+		if($result = $conn->query($sql))
+		{
+			while($output = $result->fetch_assoc())
+			{
+				unlink($output['path']);
+			}
+		}
+		else
+		{
 			echo "Error.SQL execute failed. ".$conn->error;
+		}
 
 		$conn->close();
 		header("Location: $self");
@@ -167,14 +176,14 @@
 			$duration = $conn->real_escape_string($_POST['duration']);
 
 			$sql = "INSERT INTO `institute_course` 
-					VALUES({$admin->getInstitute()->getINstituteID()}, $courseID, $fee, $duration";
+					VALUES({$admin->getInstitute()->getINstituteID()}, $courseID, $fee, $duration)";
 
 			#Check whether the query is valid
 			if(!($conn->query($sql)))
 				echo "Error. SQL execute failed.".$conn->error; 
 
 			$conn->close();
-
+			
 			#Redirect to this page
 			header("location:$self");			
 		}
@@ -202,6 +211,7 @@
 
 		#Redirect to this page
 		header("location:$self");	
+		exit();
 	}
 
 
@@ -456,7 +466,7 @@ IMAGE;
 			  				</tbody>
 			  				<tbody>
 			  					<tr>
-			  						<td colspan="5" class="pointer" id="addInstitute"><i class="fas fa-plus pr-2"></i>Add institute</td>
+			  						<td colspan="5" class="pointer" id="addInstitute"><i class="fas fa-plus pr-2"></i>Add course</td>
 			  					</tr>
 			  				</tbody>
 	  				</table>	

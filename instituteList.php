@@ -263,8 +263,15 @@ $body = <<<BODY
 									<select class='form-control' id='location' name='location'>
 										<option value="" disabled selected>$valueOfLocation</option>
 BODY;
-										foreach($location as $state)	
-											$body.="<option value='$state'>$state</option>";
+										foreach($location as $state)
+										{	
+											$body.="<option value='$state'";
+
+											if(isset($_POST["location"]) && $_POST["location"] == $state)
+												$body .= "selected";
+
+											$body.=">$state</option>";
+										}
 $body.= <<< BODY
 									</select>
 								</div>
@@ -274,7 +281,14 @@ $body.= <<< BODY
 										<option value="" disabled selected>$valueOfCourse</option>
 BODY;
 										foreach($course as $name)	
-											$body.="<option value='$name'>$name</option>";
+										{	
+											$body.="<option value='$name'";
+
+											if(isset($_POST["course"]) && $_POST["course"] == $name)
+												$body .= "selected";
+
+											$body.=">$name</option>";
+										}
 $body.= <<<BODY
 									</select>
 								</div>

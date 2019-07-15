@@ -61,6 +61,4 @@ $(document).ready(function(){
 			imageArray += "<li>" + $("#inputGroupFile")[0].files[i].name + "</li>";
 		$("#imageFiles").html(imageArray);
 	});
-
-
 });
