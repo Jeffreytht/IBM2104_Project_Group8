@@ -40,7 +40,7 @@
 <!--Name & Time-->
 					<div class="d-flex align-items-center col-md-9 ml-4 pl-0">
 						<div>
-							<h3 class='font-weight-bold mb-1 pb-0'>$output[institute_name]</h3>
+							<a href="institute.php?id=$output[institute_id]" class="text-dark"><h3 class='font-weight-bold mb-1 pb-0'>$output[institute_name]</h3></a>
 							<span class='mt-1 pt-0' style='font-size:13px'>$output[news_date]</span>
 						</div>
 					</div>
