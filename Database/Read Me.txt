@@ -1,8 +1,0 @@
-College_portal.sql is a SQL file to set up the database with entity and attribute.
-
-1. Open xampp and start mysql service. 
-2. Click on admin in the mysql (XAMPP) to redirect to phpMyAdmin page. 
-3. Create a database named college_portal by executing the following sql command:  CREATE DATABASE  college_portal;
-NOTE: naming convention is important!
-4. Refresh the phpMyAdmin and college_portal database should appear on the left panel. Select the college_portal database and click sql tab.
-5. Copy all command in college_portal.sql and paste it here. Click go and done. **
