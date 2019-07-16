@@ -125,6 +125,11 @@ $body =
 
 	<!--SIGN IN FORM HEADER-->
 							<div class ='jumbotron card card-image signin-jumbotron my-0'>
+							<div class="w3-display-topright w3-padding-large">
+							<a href='sign_in.php'>
+							<i class="fas fa-arrow-left fa-3x"></i>
+							</a>
+							</div>
 								<h2 class='display-4 text-white text-center'><strong>GODs</strong></h2>
 							</div>
 	<!--END SIGN IN FORM HEADER-->
